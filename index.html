@@ -1,0 +1,3170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>واجهة التطبيق - وكالة ناصر للإعلان</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(180deg, #e4ece9 0%, #cbdad5 100%);
+      --card-bg: rgba(255, 255, 255, 0.4);
+      --accent-coral: #e65c55;
+      --accent-teal: #57a398;
+      --text-dark: #2c3e50;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      overscroll-behavior: none;
+      touch-action: pan-y;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      overflow: hidden;
+    }
+
+    .app-container {
+      position: relative;
+      width: 100%;
+      max-width: 450px;
+      height: 90vh;
+      max-height: 90vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: linear-gradient(180deg, #eef4f2 0%, #d5e2de 100%);
+      border-radius: 35px;
+      padding: 20px 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      contain: layout paint;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    .app-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+      padding-bottom: 85px;
+    }
+
+    #aiPage.page-section.active {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 12px 12px;
+      z-index: 50;
+      background: linear-gradient(180deg, #eef4f2 0%, #d5e2de 100%);
+    }
+
+    .menu-toggle {
+      position: absolute;
+      top: 20px;
+      right: 15px;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.6);
+      border: none;
+      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .menu-toggle.hidden {
+      display: none !important;
+    }
+
+    .menu-toggle span {
+      width: 20px;
+      height: 2.5px;
+      background-color: var(--text-dark);
+      border-radius: 2px;
+    }
+
+    /* القائمة الجانبية بتأثير زجاج أبل (Apple Glassmorphic Frosted Glass) */
+    .side-menu {
+      position: absolute;
+      top: 0;
+      right: -100%;
+      width: 75%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: 20;
+      padding: 25px 20px;
+      transition: right 0.3s ease-in-out;
+      box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+      border-left: 1px solid rgba(255, 255, 255, 0.4);
+      display: flex;
+      flex-direction: column;
+      will-change: right;
+      transform: translateZ(0);
+    }
+
+    .side-menu.active {
+      right: 0;
+    }
+
+    .close-btn {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      border-radius: 50%;
+      width: 35px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text-dark);
+      cursor: pointer;
+      margin-bottom: 20px;
+      backdrop-filter: blur(5px);
+    }
+
+    .side-menu-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: var(--text-dark);
+      margin-bottom: 15px;
+      border-bottom: 2px solid rgba(87, 163, 152, 0.5);
+      padding-bottom: 8px;
+    }
+
+    .side-menu-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    .side-menu-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .side-menu-list li a {
+      text-decoration: none;
+      color: var(--text-dark);
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: block;
+      padding: 12px 15px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      transition: all 0.2s ease;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+    }
+
+    .side-menu-list li a:hover {
+      background: var(--accent-teal);
+      color: white;
+      border-color: transparent;
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.2);
+      z-index: 15;
+      display: none;
+      backdrop-filter: blur(2px);
+    }
+
+    .overlay.active {
+      display: block;
+    }
+
+    .branding-header {
+      text-align: center;
+      margin-bottom: 18px;
+      padding: 5px 0;
+    }
+
+    .logo-container {
+      display: inline-block;
+      max-width: 65%;
+    }
+
+    .logo-img {
+      width: 100%;
+      height: auto;
+      max-height: 80px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .slider-container {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      border-radius: 22px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+      flex-shrink: 0;
+      cursor: grab;
+      touch-action: pan-y;
+      user-select: none;
+    }
+
+    .slides {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.4s ease-in-out;
+      will-change: transform;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    .slide {
+      min-width: 100%;
+      height: 100%;
+    }
+
+    .slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(4px);
+      border-radius: 16px;
+      padding: 8px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+      contain: layout style paint;
+      will-change: transform;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    .card-img-wrapper {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 6px;
+      position: relative;
+      background: rgba(255,255,255,0.3);
+      contain: strict;
+    }
+
+    .card-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+
+    /* شاشات صغيرة جداً: نقلل الفراغات حتى تبقى الصور والنصوص واضحة ولا يُقص شيء منها */
+    @media (max-width: 360px) {
+      .grid-container {
+        gap: 6px;
+      }
+      .card {
+        padding: 6px;
+      }
+      .card-title {
+        font-size: 0.72rem;
+      }
+      .badge-btn {
+        font-size: 0.65rem;
+        padding: 3px 6px;
+      }
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+      white-space: nowrap;
+    }
+
+    .badge-btn {
+      background-color: #18b09c;
+      color: white;
+      border: none;
+      padding: 3px 8px;
+      border-radius: 10px;
+      font-size: 0.7rem;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .badge-btn.coral {
+      background-color: #e7413c;
+    }
+
+    .reward-section {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .reward-btn {
+      background: var(--accent-coral);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(230, 92, 85, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 0 5px;
+    }
+
+    .back-btn {
+      background: rgba(255, 255, 255, 0.6);
+      border: none;
+      border-radius: 12px;
+      padding: 8px 15px;
+      font-weight: bold;
+      color: var(--text-dark);
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+
+    .page-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--text-dark);
+    }
+
+    .items-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .item-card {
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
+      border-radius: 20px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.2s, background 0.2s;
+      contain: layout style paint;
+    }
+
+    .item-card:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .item-icon {
+      font-size: 2.2rem;
+      background: #fff;
+      width: 55px;
+      height: 55px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      flex-shrink: 0;
+    }
+
+    .item-info {
+      flex: 1;
+    }
+
+    .item-info h3 {
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+
+    .item-info p {
+      font-size: 0.72rem;
+      color: #666;
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 105px;
+    }
+
+    .action-btn {
+      border: none;
+      padding: 7px 0;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      width: 100%;
+    }
+
+    .select-btn {
+      background: var(--accent-teal);
+      color: white;
+    }
+
+    .video-btn {
+      background: var(--accent-coral);
+      color: white;
+    }
+
+    .video-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px 0;
+    }
+
+    .video-container-box {
+      width: 100%;
+      max-width: 325px;
+      height: 540px;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(10px);
+      border-radius: 25px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .video-container-box iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .video-loader {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.5);
+      z-index: 3;
+    }
+
+    .video-loader-spinner {
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(87,163,152,0.25);
+      border-top-color: var(--accent-teal);
+      border-radius: 50%;
+      animation: videoSpin 0.8s linear infinite;
+    }
+
+    @keyframes videoSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    .video-loader-text {
+      font-size: 0.85rem;
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    .modal-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.4);
+      z-index: 30;
+      display: none;
+      justify-content: center;
+      align-items: flex-end;
+      border-radius: 35px;
+      overflow: hidden;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #ffffff;
+      width: 100%;
+      max-height: 85%;
+      overflow-y: auto;
+      border-top-left-radius: 25px;
+      border-top-right-radius: 25px;
+      padding: 20px 18px;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .modal-header h3 {
+      color: var(--text-dark);
+      font-size: 1.1rem;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #888;
+      cursor: pointer;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+    }
+
+    .form-group select, .form-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      outline: none;
+      font-size: 0.9rem;
+    }
+
+    .dimension-inputs {
+      display: flex;
+      gap: 10px;
+    }
+
+    .dimension-inputs div {
+      flex: 1;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+      background: #f8faf9;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .checkbox-group label {
+      font-weight: normal;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .price-details {
+      background: #f8faf9;
+      padding: 12px;
+      border-radius: 12px;
+      margin-top: 12px;
+      border: 1px dashed var(--accent-teal);
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      margin-bottom: 5px;
+      color: #555;
+    }
+
+    .price-row.total {
+      font-weight: bold;
+      font-size: 1rem;
+      color: var(--text-dark);
+      margin-top: 8px;
+      border-top: 1px solid #ddd;
+      padding-top: 8px;
+    }
+
+    .order-submit-btn {
+      width: 100%;
+      background: var(--accent-coral);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 15px;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+
+    /* ===== شريط التنقل السفلي ===== */
+    .bottom-nav {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      width: calc(100% - 40px);
+      max-width: 410px;
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 10px 6px;
+      z-index: 500;
+      transition: transform 0.35s ease, opacity 0.35s ease;
+      opacity: 1;
+    }
+
+    .bottom-nav.nav-hidden {
+      transform: translateX(-50%) translateY(120%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .bottom-nav.nav-hidden-page {
+      display: none;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      flex: 1;
+      color: var(--text-dark);
+      padding: 2px 0;
+    }
+
+    .nav-item-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      overflow: hidden;
+      transition: box-shadow 0.2s, background 0.2s;
+    }
+
+    .nav-item.nav-active .nav-item-icon {
+      background: var(--accent-teal);
+      box-shadow: 0 4px 10px rgba(87,163,152,0.45);
+    }
+
+    .nav-item.nav-active .nav-item-icon .nav-emoji {
+      filter: brightness(0) invert(1);
+    }
+
+    .nav-item-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .nav-item-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ===== صفحة ناصر AI ===== */
+    .ai-chat-wrapper {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .ai-messages {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px 4px 15px;
+      overflow-y: auto;
+    }
+
+    .ai-bubble {
+      max-width: 85%;
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+
+    .ai-bubble.bot {
+      align-self: flex-start;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.8);
+      border-bottom-left-radius: 4px;
+    }
+
+    .ai-bubble.user {
+      align-self: flex-end;
+      background: var(--accent-teal);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .ai-bubble img.ai-preview-img {
+      max-width: 100%;
+      border-radius: 10px;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .ai-bubble .ai-goto-btn {
+      margin-top: 8px;
+      display: inline-block;
+      background: var(--accent-coral);
+      color: white;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .ai-typing {
+      align-self: flex-start;
+      display: flex;
+      gap: 4px;
+      padding: 10px 14px;
+    }
+
+    .ai-typing span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #999;
+      animation: aiTypingBounce 1.2s infinite ease-in-out;
+    }
+
+    .ai-typing span:nth-child(2) { animation-delay: 0.15s; }
+    .ai-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes aiTypingBounce {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    .ai-input-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 20px;
+      padding: 6px 6px 6px 12px;
+      border: 1px solid rgba(255,255,255,0.8);
+    }
+
+    .ai-input-bar input[type="text"] {
+      flex: 1;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-size: 0.9rem;
+      font-family: inherit;
+      color: var(--text-dark);
+      min-width: 0;
+    }
+
+    .ai-icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .ai-icon-btn.send {
+      background: var(--accent-teal);
+      color: white;
+    }
+
+    /* ===== صفحة العروض ===== */
+    .offer-card {
+      position: relative;
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .offer-card.offer-active {
+      background: linear-gradient(135deg, var(--accent-coral), #f3897f);
+      color: white;
+      box-shadow: 0 10px 22px rgba(230,92,85,0.4);
+    }
+
+    .offer-card.offer-active:active {
+      transform: scale(0.98);
+    }
+
+    .offer-card.offer-expired {
+      background: rgba(200,200,200,0.35);
+      filter: grayscale(1);
+      opacity: 0.55;
+      cursor: not-allowed;
+      color: #555;
+    }
+
+    .offer-title {
+      font-size: 1.05rem;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .offer-sub {
+      font-size: 0.8rem;
+      opacity: 0.9;
+    }
+
+    .offer-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(255,255,255,0.3);
+      padding: 4px 10px;
+      border-radius: 10px;
+      font-size: 0.72rem;
+      font-weight: bold;
+    }
+
+    .offer-card.offer-expired .offer-badge {
+      background: rgba(0,0,0,0.15);
+    }
+
+    /* ===== صفحة حاسبة الأسعار ===== */
+    .calc-frame-wrapper {
+      width: 100%;
+      height: calc(100% - 70px);
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fff;
+      position: relative;
+    }
+
+    .calc-frame-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .calc-open-external {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      background: rgba(255,255,255,0.7);
+      color: var(--text-dark);
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 14px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    /* ===== صفحة الإعجابات ===== */
+    .fav-card {
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 18px;
+      padding: 12px 15px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .fav-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .fav-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .fav-name {
+      font-weight: bold;
+      color: var(--text-dark);
+      font-size: 0.9rem;
+    }
+
+    .fav-hint {
+      font-size: 0.7rem;
+      color: #789;
+      margin-top: 3px;
+    }
+
+    .fav-remove-btn {
+      background: none;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: #c0392b;
+      padding: 6px;
+    }
+
+    .fav-empty {
+      text-align: center;
+      color: #789;
+      font-size: 0.9rem;
+      padding: 40px 20px;
+    }
+
+    .fav-order-btn {
+      position: sticky;
+      bottom: 0;
+      width: 100%;
+      background: var(--accent-teal);
+      color: white;
+      border: none;
+      padding: 13px;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .like-heart-btn {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.75);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      cursor: pointer;
+      z-index: 5;
+    }
+
+    .card {
+      position: relative;
+    }
+    .site-footer {
+      text-align: center;
+      font-size: 0.68rem;
+      color: #7c8f8c;
+      padding: 18px 0 4px;
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container" id="appContainer">
+
+    <button class="menu-toggle" id="menuToggleBtn" onclick="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- القائمة الجانبية بدون أيقونات وبتأثير زجاجي متطور -->
+    <div class="side-menu" id="sideMenu">
+      <button class="close-btn" onclick="toggleMenu()">✕</button>
+      <div class="side-menu-title">جميع الأصناف</div>
+      <ul class="side-menu-list">
+        <li><a onclick="navigateTo('home')">بوكسات</a></li>
+        <li><a onclick="navigateTo('cups')">أكواب</a></li>
+        <li><a onclick="navigateTo('stickers')">استيكرات</a></li>
+        <li><a onclick="navigateTo('banners')">بنرات</a></li>
+        <li><a onclick="navigateTo('acrylic')">أكرليك</a></li>
+        <li><a onclick="navigateTo('home')">كروت</a></li>
+        <li><a onclick="navigateTo('home')">تغريسات</a></li>
+        <li><a onclick="navigateTo('foam')">فلين</a></li>
+        <li><a onclick="navigateTo('id_cards')">إي دي</a></li>
+        <li><a onclick="navigateTo('letterboards')">لوحات حروف</a></li>
+        <li><a onclick="navigateTo('home')">بوكس مضيء</a></li>
+        <li><a onclick="navigateTo('bags')">أكياس</a></li>
+        <li><a onclick="navigateTo('awards')">دروع</a></li>
+        <li><a onclick="navigateTo('pins')">بروشات</a></li>
+        <li><a onclick="navigateTo('brochures')">بروشورات</a></li>
+      </ul>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- 1. الصفحة الرئيسية -->
+    <div id="homePage" class="page-section active">
+      <div class="branding-header">
+        <div class="logo-container">
+          <img src="LOGO 1.webp" alt="شعار وكالة ناصر" class="logo-img" loading="eager" decoding="async" fetchpriority="high">
+        </div>
+      </div>
+
+      <div class="slider-container" id="sliderContainer">
+        <div class="slides" id="slider">
+          <div class="slide"><img src="SORA1.webp" alt="إعلان 1" loading="eager" decoding="async" fetchpriority="high"></div>
+          <div class="slide"><img src="SORA2.webp" alt="إعلان 2" loading="lazy" decoding="async"></div>
+          <div class="slide"><img src="SORA3.webp" alt="إعلان 3" loading="lazy" decoding="async"></div>
+          <div class="slide"><img src="SORA4.webp" alt="إعلان 4" loading="lazy" decoding="async"></div>
+          <div class="slide"><img src="SORA5.webp" alt="إعلان 5" loading="lazy" decoding="async"></div>
+        </div>
+      </div>
+
+      <div class="grid-container">
+        <div class="card" data-fav-id="boxes" data-fav-name="بوكسات" data-fav-icon="SORA6.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'boxes','بوكسات','SORA6.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA6.webp" loading="lazy" decoding="async" alt="بوكسات"></div><div class="card-title">بوكسات</div><button class="badge-btn coral">(غ) متاح</button></div>
+        
+        <div class="card" onclick="navigateTo('cups')" data-fav-id="cups" data-fav-name="أكواب" data-fav-icon="SORA7.webp">
+          <button class="like-heart-btn" onclick="toggleFavorite(event,'cups','أكواب','SORA7.webp')">🤍</button>
+          <div class="card-img-wrapper"><img src="SORA7.webp" loading="lazy" decoding="async" alt="أكواب"></div>
+          <div class="card-title">أكواب</div>
+          <button class="badge-btn">اطلب</button>
+        </div>
+
+        <div class="card" onclick="navigateTo('stickers')" data-fav-id="stickers" data-fav-name="استيكرات" data-fav-icon="SORA8.webp">
+          <button class="like-heart-btn" onclick="toggleFavorite(event,'stickers','استيكرات','SORA8.webp')">🤍</button>
+          <div class="card-img-wrapper"><img src="SORA8.webp" loading="lazy" decoding="async" alt="استيكرات"></div>
+          <div class="card-title">استيكرات</div>
+          <button class="badge-btn">اطلب</button>
+        </div>
+
+        <div class="card" onclick="navigateTo('banners')" data-fav-id="banners" data-fav-name="بنرات" data-fav-icon="SORA9.webp">
+          <button class="like-heart-btn" onclick="toggleFavorite(event,'banners','بنرات','SORA9.webp')">🤍</button>
+          <div class="card-img-wrapper"><img src="SORA9.webp" loading="lazy" decoding="async" alt="بنرات"></div>
+          <div class="card-title">بنرات</div>
+          <button class="badge-btn">اطلب</button>
+        </div>
+
+        <div class="card" onclick="navigateTo('acrylic')" data-fav-id="acrylic" data-fav-name="أكرليك" data-fav-icon="SORA10.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'acrylic','أكرليك','SORA10.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA10.webp" loading="lazy" decoding="async" alt="أكرليك"></div><div class="card-title">أكرليك</div><button class="badge-btn">اطلب</button></div>
+        <div class="card" data-fav-id="cards" data-fav-name="كروت" data-fav-icon="SORA11.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'cards','كروت','SORA11.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA11.webp" loading="lazy" decoding="async" alt="كروت"></div><div class="card-title">كروت</div><button class="badge-btn coral">(غ) متاح</button></div>
+        <div class="card" data-fav-id="planters" data-fav-name="تغريسات" data-fav-icon="SORA12.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'planters','تغريسات','SORA12.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA12.webp" loading="lazy" decoding="async" alt="تغريسات"></div><div class="card-title">تغريسات</div><button class="badge-btn coral">(غ) متاح</button></div>
+        <div class="card" onclick="navigateTo('foam')" data-fav-id="foam" data-fav-name="فلين" data-fav-icon="SORA13.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'foam','فلين','SORA13.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA13.webp" loading="lazy" decoding="async" alt="فلين"></div><div class="card-title">فلين</div><button class="badge-btn">اطلب</button></div>
+        <div class="card" onclick="navigateTo('id_cards')" data-fav-id="id_cards" data-fav-name="إي دي" data-fav-icon="SORA14.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'id_cards','إي دي','SORA14.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA14.webp" loading="lazy" decoding="async" alt="إي دي"></div><div class="card-title">إي دي</div><button class="badge-btn">اطلب</button></div>
+        <div class="card" onclick="navigateTo('letterboards')" data-fav-id="letterboards" data-fav-name="لوحات حروف" data-fav-icon="SORA15.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'letterboards','لوحات حروف','SORA15.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA15.webp" loading="lazy" decoding="async" alt="لوحات حروف"></div><div class="card-title">لوحات حروف</div><button class="badge-btn">اطلب</button></div>
+        <div class="card" data-fav-id="lightbox" data-fav-name="بوكس مضيء" data-fav-icon="SORA16.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'lightbox','بوكس مضيء','SORA16.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA16.webp" loading="lazy" decoding="async" alt="بوكس مضيء"></div><div class="card-title">بوكس مضيء</div><button class="badge-btn">اطلب</button></div>
+        <div class="card" onclick="navigateTo('bags')" data-fav-id="bags" data-fav-name="أكياس" data-fav-icon="SORA17.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'bags','أكياس','SORA17.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA17.webp" loading="lazy" decoding="async" alt="أكياس"></div><div class="card-title">أكياس</div><button class="badge-btn">اطلب</button></div>
+        <div class="card" onclick="navigateTo('awards')" data-fav-id="awards" data-fav-name="دروع" data-fav-icon="SORA18.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'awards','دروع','SORA18.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA18.webp" loading="lazy" decoding="async" alt="دروع" width="120" height="85"></div><div class="card-title">دروع</div><button class="badge-btn">اطلب</button></div>
+        <div class="card" onclick="navigateTo('pins')" data-fav-id="pins" data-fav-name="بروشات" data-fav-icon="SORA19.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'pins','بروشات','SORA19.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA19.webp" loading="lazy" decoding="async" alt="بروشات" width="120" height="85" onerror="this.style.display='none';"></div><div class="card-title">بروشات</div><button class="badge-btn">اطلب</button></div>
+        <div class="card" onclick="navigateTo('brochures')" data-fav-id="brochures" data-fav-name="بروشورات" data-fav-icon="SORA20.webp"><button class="like-heart-btn" onclick="toggleFavorite(event,'brochures','بروشورات','SORA20.webp')">🤍</button><div class="card-img-wrapper"><img src="SORA20.webp" loading="lazy" decoding="async" alt="بروشورات" width="120" height="85" onerror="this.style.display='none';"></div><div class="card-title">بروشورات</div><button class="badge-btn">اطلب</button></div>
+      </div>
+
+      <div class="site-footer">© JGS.Nasser Advertising Agency</div>
+
+    </div>
+
+    <!-- صفحة الأكرليك -->
+    <div id="acrylicPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">قسم الأكرليك</div>
+        <div style="width: 50px;"></div>
+      </div>
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-icon">💎</div>
+          <div class="item-info">
+            <h3>لوحات وشاشات أكرليك</h3>
+            <p>سعر المتر المربع 350 ريال لكافة المقاسات شامل الضريبة</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('acrylic', 'main')">اطلب الآن</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('0', 'فيديو أكرليك', 'acrylic')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- صفحة الفلين -->
+    <div id="foamPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">قسم الفلين</div>
+        <div style="width: 50px;"></div>
+      </div>
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-icon">📐</div>
+          <div class="item-info">
+            <h3>طباعة وقص فلين</h3>
+            <p>حساب بالمتر المربع (120 ريال للمتر) مع إضافة ثابتة للمقاسات الأقل من A4</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('foam', 'main')">اطلب الآن</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('0', 'فيديو فلين', 'foam')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- صفحة الإي دي -->
+    <div id="idCardsPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">قسم الإي دي</div>
+        <div style="width: 50px;"></div>
+      </div>
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-icon">🪪</div>
+          <div class="item-info">
+            <h3>بطاقات وعروض إي دي</h3>
+            <p>سعر الحبة 20 ريال شامل الضريبة</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('id_cards', 'main')">اطلب الآن</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('0', 'فيديو إي دي', 'id_cards')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- صفحة الأكياس -->
+    <div id="bagsPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">قسم الأكياس</div>
+        <div style="width: 50px;"></div>
+      </div>
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-icon">🛍️</div>
+          <div class="item-info">
+            <h3>أكياس مطبوعة</h3>
+            <p>غير متوفر في الوقت الحالي</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('bags', 'main')">عرض الحالة</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('0', 'فيديو أكياس', 'bags')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- قسم البروشات -->
+    <div id="pinsPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">قسم البروشات</div>
+        <div style="width: 50px;"></div>
+      </div>
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-icon">📌</div>
+          <div class="item-info">
+            <h3>بروش يو في</h3>
+            <p>سعر الحبة 25 ريال شامل الضريبة</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('pins', 'uv')">اطلب الآن</button>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-icon">📌</div>
+          <div class="item-info">
+            <h3>بروش أكريليك</h3>
+            <p>سعر الحبة 20 ريال شامل الضريبة</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('pins', 'acrylic')">اطلب الآن</button>
+          </div>
+        </div>
+        <div class="item-card">
+          <div class="item-icon">📌</div>
+          <div class="item-info">
+            <h3>بروش معدن ذهبي</h3>
+            <p>سعر الحبة 20 ريال شامل الضريبة</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('pins', 'metal')">اطلب الآن</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- قسم البروشورات -->
+    <div id="brochuresPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">قسم البروشورات</div>
+        <div style="width: 50px;"></div>
+      </div>
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-icon">📄</div>
+          <div class="item-info">
+            <h3>بروشورات دعائية</h3>
+            <p>الأسعار غير متاحة حالياً</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('brochures', 'main')">اطلب الآن</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div id="cupsPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">قسم الأكواب</div>
+        <div style="width: 50px;"></div>
+      </div>
+
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-icon">🥤</div>
+          <div class="item-info">
+            <h3>أكواب ورقية</h3>
+            <p>طباعة ورقية - اختر المقاس والعدد</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('cups', 'paper')">اختر المقاس</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('7674667341350767880', 'فيديو أكواب ورقية', 'cups')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-icon">🏷️</div>
+          <div class="item-info">
+            <h3>أكواب تغليف استيكر</h3>
+            <p>تغليف بالاستيكر - اختر المقاس والعدد</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('cups', 'wrap')">اختر المقاس</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('7667882461157723399', 'فيديو أكواب تغليف استيكر', 'cups')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-icon">🎁</div>
+          <div class="item-info">
+            <h3>أكواب توزيعات استيكر</h3>
+            <p>شاملة الطباعة والتغليف بالاستيكر</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('cups', 'sticker')">اختر المقاس</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('7671706454637776146', 'فيديو أكواب التوزيعات', 'cups')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-icon">🧊</div>
+          <div class="item-info">
+            <h3>أكواب بلاستيك</h3>
+            <p>شفافة وعالية الجودة - اختر المقاس والعدد</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('cups', 'plastic')">اختر المقاس</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('7384059299812642055', 'فيديو كاسات بلاستيك', 'cups')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. صفحة قسم الاستيكرات -->
+    <div id="stickersPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">قسم الاستيكرات</div>
+        <div style="width: 50px;"></div>
+      </div>
+
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-icon">✂️</div>
+          <div class="item-info">
+            <h3>استيكرات قص (مقصومة)</h3>
+            <p>ادخل المقاس والعدد للحساب الدقيق</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('stickers', 'cut')">اطلب الآن</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('7651590235909819656', 'فيديو استيكرات قص', 'stickers')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-icon">📜</div>
+          <div class="item-info">
+            <h3>استيكرات بدون قص</h3>
+            <p>طباعة رول بالمتر بدون تفريغ قص</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('stickers', 'uncut')">اطلب الآن</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('7677873609653734664', 'فيديو استيكرات بدون قص', 'stickers')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-icon">✨</div>
+          <div class="item-info">
+            <h3>استيكرات يوفي (UV DTF)</h3>
+            <p>اختر المقاس المطلوب (A3 أو متر)</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('stickers', 'uv')">اختر المقاس</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('7669719531245276424', 'فيديو استيكرات يوفي', 'stickers')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. صفحة قسم البنرات -->
+    <div id="bannersPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">قسم البنرات</div>
+        <div style="width: 50px;"></div>
+      </div>
+
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-icon">🏗️</div>
+          <div class="item-info">
+            <h3>بنر</h3>
+            <p>سعر المتر 60 ريال - مع إمكانية إضافة فريم أو عمود</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('banners', 'with_iron')">اطلب الآن</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('0', 'فيديو بنر', 'banners')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-icon">📌</div>
+          <div class="item-info">
+            <h3>رول أب</h3>
+            <p>مقاس واحد (200 × 85 سم) - سعر ثابت</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('banners', 'rollup')">اختر المقاس</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('0', 'فيديو رول أب', 'banners')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-icon">🚪</div>
+          <div class="item-info">
+            <h3>استاند بوابة</h3>
+            <p>مقاس واحد (180 × 80 سم) - سعر ثابت</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('banners', 'gate_stand')">اختر المقاس</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('0', 'فيديو استاند بوابة', 'banners')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4ب. صفحة قسم لوحات الحروف -->
+    <div id="letterboardsPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">قسم لوحات الحروف</div>
+        <div style="width: 50px;"></div>
+      </div>
+
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-icon">🔤</div>
+          <div class="item-info">
+            <h3>لوحة حروف</h3>
+            <p>سعر المتر 500 ريال شامل التركيب - ضمان 6 أشهر</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('letterboards', 'main')">اطلب الآن</button>
+            <button class="action-btn video-btn" onclick="openVideoPage('0', 'فيديو لوحات حروف', 'letterboards')">فيديو تعريفي 🎬</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4ج. صفحة قسم الدروع -->
+    <div id="awardsPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">قسم الدروع</div>
+        <div style="width: 50px;"></div>
+      </div>
+
+      <div class="items-grid">
+        <div class="item-card">
+          <div class="item-icon">🥇</div>
+          <div class="item-info">
+            <h3>درع مع علبة</h3>
+            <p>متوفر بمقاسات صغير / وسط / كبير</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('awards', 'case')">اختر المقاس</button>
+            <button class="action-btn video-btn" onclick="openImagePage('DERAA1.webp', 'صورة درع مع علبة', 'awards')">صورة تعريفية 🖼️</button>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-icon">🏆</div>
+          <div class="item-info">
+            <h3>درع مع بوكس</h3>
+            <p>متوفر بمقاسات صغير / وسط / كبير</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('awards', 'box')">اختر المقاس</button>
+            <button class="action-btn video-btn" onclick="openImagePage('DERAA2.webp', 'صورة درع مع بوكس', 'awards')">صورة تعريفية 🖼️</button>
+          </div>
+        </div>
+
+        <div class="item-card">
+          <div class="item-icon">⚔️</div>
+          <div class="item-info">
+            <h3>درع سيف بوكس</h3>
+            <p>متوفر شفاف / مغلق</p>
+          </div>
+          <div class="action-buttons">
+            <button class="action-btn select-btn" onclick="openModal('awards', 'swordbox')">اختر المقاس</button>
+            <button class="action-btn video-btn" onclick="openImagePage('DERAA3.webp', 'صورة درع سيف بوكس', 'awards')">صورة تعريفية 🖼️</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. صفحة عرض الفيديو الداخلي -->
+    <div id="videoPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" id="videoBackBtn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title" id="videoPageTitle">فيديو تعريفي</div>
+        <div style="width: 50px;"></div>
+      </div>
+
+      <div class="video-wrapper">
+        <div class="video-container-box">
+          <div class="video-loader" id="videoLoader">
+            <div class="video-loader-spinner"></div>
+            <div class="video-loader-text">جاري تحميل الفيديو...</div>
+          </div>
+          <iframe id="tiktokIframe" src="" allow="autoplay; fullscreen" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. صفحة عرض الصورة التعريفية -->
+    <div id="imagePage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" id="imageBackBtn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title" id="imagePageTitle">صورة تعريفية</div>
+        <div style="width: 50px;"></div>
+      </div>
+
+      <div class="video-wrapper">
+        <div class="video-container-box" style="height: auto;">
+          <img id="awardsImage" src="" alt="صورة تعريفية" loading="eager" decoding="async" style="width: 100%; display: block;">
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. صفحة ناصر AI -->
+    <div id="aiPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">ناصر AI</div>
+        <div style="width: 50px;"></div>
+      </div>
+      <div class="ai-chat-wrapper">
+        <div class="ai-messages" id="aiMessages">
+          <div class="ai-bubble bot">أهلاً بك 👋 أنا ناصر AI، اسألني عن أي منتج أو خدمة في وكالة ناصر للإعلان، أو ارفع صورة/صوّر منتج وسأخبرك أي قسم يتبع له.</div>
+        </div>
+        <div class="ai-input-bar">
+          <button class="ai-icon-btn" id="aiCameraBtn" title="التقاط صورة">📷</button>
+          <button class="ai-icon-btn" id="aiUploadBtn" title="رفع صورة">🖼️</button>
+          <input type="text" id="aiTextInput" placeholder="اكتب سؤالك هنا..." onkeydown="if(event.key==='Enter'){sendAiText();}">
+          <button class="ai-icon-btn send" onclick="sendAiText()">➤</button>
+        </div>
+        <input type="file" id="aiFileInput" accept="image/*" style="display:none;">
+        <input type="file" id="aiCameraInput" accept="image/*" capture="environment" style="display:none;">
+      </div>
+    </div>
+
+    <!-- 8. صفحة العروض -->
+    <div id="offersPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">عروضنا</div>
+        <div style="width: 50px;"></div>
+      </div>
+      <div class="items-grid" style="gap:0;">
+        <div class="offer-card offer-active" onclick="openOfferInquiry('عروض اليوم الوطني السعودي')">
+          <div class="offer-badge">خصم حتى 10%</div>
+          <div class="offer-title">🇸🇦 عروض اليوم الوطني السعودي</div>
+          <div class="offer-sub">خصومات تصل إلى 10% على أعمال اليوم الوطني — اطلب الآن قبل انتهاء العرض</div>
+        </div>
+        <div class="offer-card offer-expired">
+          <div class="offer-badge">🔒 انتهى العرض</div>
+          <div class="offer-title">عروض رمضان جازان</div>
+          <div class="offer-sub">هذا العرض غير متاح حالياً</div>
+        </div>
+        <div class="offer-card offer-expired">
+          <div class="offer-badge">🔒 انتهى العرض</div>
+          <div class="offer-title">عروض يوم التأسيس</div>
+          <div class="offer-sub">هذا العرض غير متاح حالياً</div>
+        </div>
+        <div class="offer-card offer-expired">
+          <div class="offer-badge">🔒 انتهى العرض</div>
+          <div class="offer-title">عروض شتاء جازان</div>
+          <div class="offer-sub">هذا العرض غير متاح حالياً</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 10. صفحة أعجاباتي -->
+    <div id="favoritesPage" class="page-section">
+      <div class="header-bar">
+        <button class="back-btn" onclick="goBack()">❮ عودة</button>
+        <div class="page-title">أعجاباتي</div>
+        <div style="width: 50px;"></div>
+      </div>
+      <div id="favoritesList"></div>
+    </div>
+
+    <!-- النافذة المنبثقة للطلب -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="modalTitle">تفاصيل الطلب</h3>
+          <button class="close-modal" onclick="closeModal()">✕</button>
+        </div>
+
+        <!-- حقول الأكرليك -->
+        <div id="acrylicForm" style="display: none;">
+          <div class="form-group">
+            <label>المقاس (بالسنتيمتر):</label>
+            <div class="dimension-inputs">
+              <div>
+                <input type="text" inputmode="decimal" id="acrylicWidth" placeholder="العرض (سم)" value="100" oninput="normalizeInputDigits(this); calculateAcrylicPrice()">
+              </div>
+              <div>
+                <input type="text" inputmode="decimal" id="acrylicHeight" placeholder="الارتفاع (سم)" value="100" oninput="normalizeInputDigits(this); calculateAcrylicPrice()">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>العدد المطلوب (بالحبة):</label>
+            <input type="text" inputmode="decimal" id="acrylicQuantity" placeholder="مثال: 1" value="1" oninput="normalizeInputDigits(this); calculateAcrylicPrice()">
+          </div>
+        </div>
+
+        <!-- حقول الفلين -->
+        <div id="foamForm" style="display: none;">
+          <div class="form-group">
+            <label>مقاس الفلين (بالسنتيمتر):</label>
+            <div class="dimension-inputs">
+              <div>
+                <input type="text" inputmode="decimal" id="foamWidth" placeholder="العرض (سم)" value="100" oninput="normalizeInputDigits(this); calculateFoamPrice()">
+              </div>
+              <div>
+                <input type="text" inputmode="decimal" id="foamHeight" placeholder="الارتفاع (سم)" value="100" oninput="normalizeInputDigits(this); calculateFoamPrice()">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- حقول الإي دي -->
+        <div id="idCardsForm" style="display: none;">
+          <div class="form-group">
+            <label>العدد المطلوب (بالحبة):</label>
+            <input type="text" inputmode="decimal" id="idQuantity" placeholder="مثال: 1" value="1" oninput="normalizeInputDigits(this); calculateIdPrice()">
+          </div>
+        </div>
+
+        <!-- حقول الأكياس -->
+        <div id="bagsForm" style="display: none;">
+          <div class="form-group">
+            <label style="color: var(--accent-coral); font-weight: bold; text-align: center; padding: 10px;">غير متوفر في الوقت الحالي</label>
+          </div>
+        </div>
+
+        <!-- حقول المقاس والعدد لاستيكرات القص -->
+        <div id="cutStickerForm" style="display: none;">
+          <div class="form-group">
+            <label>المقاس (بالسنتيمتر):</label>
+            <div class="dimension-inputs">
+              <div>
+                <input type="text" inputmode="decimal" id="stickerWidth" placeholder="العرض (سم)" value="4" oninput="normalizeInputDigits(this); calculateCutStickerPrice()">
+              </div>
+              <div>
+                <input type="text" inputmode="decimal" id="stickerHeight" placeholder="الطول (سم)" value="4" oninput="normalizeInputDigits(this); calculateCutStickerPrice()">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>العدد المطلوب (بالحبة):</label>
+            <input type="text" inputmode="decimal" id="stickerQuantity" placeholder="مثال: 500" value="441" oninput="normalizeInputDigits(this); calculateCutStickerPrice()">
+          </div>
+        </div>
+
+        <!-- حقول المقاس والعدد لاستيكرات بدون قص -->
+        <div id="uncutStickerForm" style="display: none;">
+          <div class="form-group">
+            <label>المقاس (بالسنتيمتر):</label>
+            <div class="dimension-inputs">
+              <div>
+                <input type="text" inputmode="decimal" id="uncutWidth" placeholder="العرض (سم)" value="100" oninput="normalizeInputDigits(this); calculateUncutStickerPrice()">
+              </div>
+              <div>
+                <input type="text" inputmode="decimal" id="uncutHeight" placeholder="الطول (سم)" value="100" oninput="normalizeInputDigits(this); calculateUncutStickerPrice()">
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>العدد المطلوب (بالحبة):</label>
+            <input type="text" inputmode="decimal" id="uncutQuantity" placeholder="مثال: 1" value="1" oninput="normalizeInputDigits(this); calculateUncutStickerPrice()">
+          </div>
+        </div>
+
+        <!-- حقول المقاس للبنر -->
+        <div id="bannerDimensionForm" style="display: none;">
+          <div class="form-group">
+            <label>المقاس (بالسنتيمتر):</label>
+            <div class="dimension-inputs">
+              <div>
+                <input type="text" inputmode="decimal" id="bannerWidth" placeholder="العرض (سم)" value="100" oninput="normalizeInputDigits(this); calculateBannerPrice()">
+              </div>
+              <div>
+                <input type="text" inputmode="decimal" id="bannerHeight" placeholder="الارتفاع (سم)" value="100" oninput="normalizeInputDigits(this); calculateBannerPrice()">
+              </div>
+            </div>
+          </div>
+          <div class="form-group" id="bannerOptionsGroup">
+            <label>خيارات إضافية:</label>
+            <div class="checkbox-group">
+              <label><input type="checkbox" id="addIronFrame" onchange="calculateBannerPrice()"> مع فريم حديد (+50 ريال لكل متر)</label>
+              <label><input type="checkbox" id="addColumn" onchange="calculateBannerPrice()"> مع عمود (+50 ريال لكل متر)</label>
+              <label><input type="checkbox" id="addInstallation" onchange="calculateBannerPrice()"> مع تركيب (تحدد المطبعة السعر حسب مكان التركيب)</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- حقل العرض لوحات الحروف -->
+        <div id="letterBoardForm" style="display: none;">
+          <div class="form-group">
+            <label>عرض اللوحة (بالمتر):</label>
+            <input type="text" inputmode="decimal" id="letterBoardWidth" placeholder="مثال: 1" step="0.1" value="1" oninput="normalizeInputDigits(this); calculateLetterBoardPrice()">
+          </div>
+        </div>
+
+        <!-- حقول المقاس والعدد للأكواب -->
+        <div id="cupsForm" style="display: none;">
+          <div class="form-group">
+            <label>اختر المقاس:</label>
+            <select id="cupSizeSelect" onchange="calculateCupsPrice()"></select>
+          </div>
+          <div class="form-group" id="cupQtySelectGroup">
+            <label>اختر الكمية:</label>
+            <select id="cupQtySelect" onchange="calculateCupsPrice()"></select>
+          </div>
+          <div class="form-group" id="cupQtyInputGroup" style="display: none;">
+            <label>العدد المطلوب (بالحبة):</label>
+            <input type="text" inputmode="decimal" id="cupQtyInput" placeholder="مثال: 100" oninput="normalizeInputDigits(this); calculateCupsPrice()">
+          </div>
+        </div>
+
+        <!-- القائمة المنسدلة للأصناف الثابتة -->
+        <div id="selectStickerForm" class="form-group">
+          <label>اختر المقاس والعدد:</label>
+          <select id="sizeSelect" onchange="updatePrice()"></select>
+        </div>
+
+        <!-- حقول البروشات -->
+        <div id="pinsForm" style="display: none;">
+          <div class="form-group">
+            <label>العدد المطلوب (بالحبة):</label>
+            <input type="text" inputmode="decimal" id="pinsQuantity" placeholder="مثال: 10" value="10" oninput="normalizeInputDigits(this); calculatePinPrice()">
+          </div>
+        </div>
+
+        <!-- حقول البروشورات (بدون سعر) -->
+        <div id="brochuresForm" style="display: none;">
+          <div class="form-group">
+            <label>اختر المقاس:</label>
+            <select id="brochureSizeSelect" onchange="calculateBrochurePrice()">
+              <option value="0">A4 مطوي (ثلاث طيات)</option>
+              <option value="1">A5</option>
+              <option value="2">DL</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>العدد المطلوب (بالحبة):</label>
+            <input type="text" inputmode="decimal" id="brochureQuantity" placeholder="مثال: 100" value="100" oninput="normalizeInputDigits(this); calculateBrochurePrice()">
+          </div>
+        </div>
+
+        <div class="price-details" id="priceDetailsBox">
+          <div class="price-row">
+            <span>الكمية / العدد:</span>
+            <span id="qtyDisplay">0 حبة</span>
+          </div>
+          <div class="price-row">
+            <span>سعر الحبة / التكلفة:</span>
+            <span id="unitPriceDisplay">0.00 ريال</span>
+          </div>
+          <div class="price-row total">
+            <span>السعر الإجمالي (شامل الضريبة):</span>
+            <span id="totalPriceDisplay">0.00 ريال</span>
+          </div>
+        </div>
+
+        <button class="order-submit-btn" id="submitOrderBtn" onclick="sendToWhatsApp()">اتمام الطلب</button>
+      </div>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav" id="bottomNav">
+    <button class="nav-item" id="navBtn-ai" onclick="navigateTo('ai')">
+      <span class="nav-item-icon"><img src="SORA30.webp" alt="" width="22" height="22" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span class="nav-emoji" style="display:none;">🤖</span></span>
+      <span class="nav-item-label">ناصر AI</span>
+    </button>
+    <button class="nav-item" id="navBtn-social" onclick="openSocialLinks()">
+      <span class="nav-item-icon"><img src="SORA31.webp" alt="" width="22" height="22" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span class="nav-emoji" style="display:none;">📱</span></span>
+      <span class="nav-item-label">وسائل التواصل</span>
+    </button>
+    <button class="nav-item" id="navBtn-offers" onclick="navigateTo('offers')">
+      <span class="nav-item-icon"><img src="SORA32.webp" alt="" width="22" height="22" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span class="nav-emoji" style="display:none;">🎁</span></span>
+      <span class="nav-item-label">عروضنا</span>
+    </button>
+    <button class="nav-item" id="navBtn-calculator" onclick="window.location.href='https://imaginative-basbousa-ed6355.netlify.app/'">
+      <span class="nav-item-icon"><img src="SORA33.webp" alt="" width="22" height="22" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span class="nav-emoji" style="display:none;">🧮</span></span>
+      <span class="nav-item-label">حاسبة أسعار</span>
+    </button>
+    <button class="nav-item" id="navBtn-favorites" onclick="navigateTo('favorites')">
+      <span class="nav-item-icon"><img src="SORA34.webp" alt="" width="22" height="22" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span class="nav-emoji" style="display:none;">❤️</span></span>
+      <span class="nav-item-label">أعجاباتي</span>
+    </button>
+  </nav>
+
+  <script>
+    let currentCategoryGroup = '';
+    let currentCategoryKey = '';
+    let currentCalculatedData = {};
+
+    function navigateTo(pageId) {
+      const resolvedPageId = PAGE_ELEMENT_MAP[pageId] ? pageId : 'home';
+      if (!isPopStateNav) {
+        history.pushState({ pageId: resolvedPageId }, '', '#' + resolvedPageId);
+      }
+      renderPage(resolvedPageId);
+    }
+
+    const PAGE_ELEMENT_MAP = {
+      home: 'homePage',
+      cups: 'cupsPage',
+      stickers: 'stickersPage',
+      banners: 'bannersPage',
+      letterboards: 'letterboardsPage',
+      awards: 'awardsPage',
+      acrylic: 'acrylicPage',
+      foam: 'foamPage',
+      id_cards: 'idCardsPage',
+      bags: 'bagsPage',
+      pins: 'pinsPage',
+      brochures: 'brochuresPage',
+      video: 'videoPage',
+      image: 'imagePage',
+      ai: 'aiPage',
+      offers: 'offersPage',
+      favorites: 'favoritesPage'
+    };
+
+    let currentPageId = 'home';
+    let isPopStateNav = false;
+
+    function renderPage(pageId) {
+      document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.remove('active');
+      });
+
+      const menuBtn = document.getElementById('menuToggleBtn');
+      const elId = PAGE_ELEMENT_MAP[pageId] || 'homePage';
+      document.getElementById(elId).classList.add('active');
+
+      if (pageId === 'home') {
+        menuBtn.classList.remove('hidden');
+      } else {
+        menuBtn.classList.add('hidden');
+      }
+
+      const bottomNav = document.getElementById('bottomNav');
+      if (bottomNav) {
+        if (pageId === 'home') {
+          bottomNav.classList.remove('nav-hidden-page');
+        } else {
+          bottomNav.classList.add('nav-hidden-page');
+        }
+      }
+
+      if (pageId !== 'video') {
+        document.getElementById('tiktokIframe').src = '';
+      }
+
+      if (pageId === 'favorites') {
+        renderFavoritesPage();
+      }
+
+      const menu = document.getElementById('sideMenu');
+      if (menu.classList.contains('active')) {
+        toggleMenu();
+      }
+
+      updateBottomNavActive(pageId);
+      const appContainer = document.getElementById('appContainer');
+      if (appContainer) appContainer.scrollTop = 0;
+
+      currentPageId = pageId;
+    }
+
+    window.addEventListener('popstate', (e) => {
+      isPopStateNav = true;
+      const pid = (e.state && e.state.pageId) || 'home';
+      navigateTo(pid);
+      isPopStateNav = false;
+    });
+
+    function goBack() {
+      history.back();
+    }
+
+    /* ===== توحيد الأرقام العربية إلى إنجليزية ===== */
+    function normalizeInputDigits(inputEl) {
+      const arabicIndic = '٠١٢٣٤٥٦٧٨٩';
+      const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+      const original = inputEl.value;
+      let converted = '';
+      for (let i = 0; i < original.length; i++) {
+        const ch = original[i];
+        const aIdx = arabicIndic.indexOf(ch);
+        const pIdx = persianDigits.indexOf(ch);
+        if (aIdx !== -1) converted += aIdx;
+        else if (pIdx !== -1) converted += pIdx;
+        else converted += ch;
+      }
+      converted = converted.replace(/[^0-9.]/g, '');
+      const firstDot = converted.indexOf('.');
+      if (firstDot !== -1) {
+        converted = converted.slice(0, firstDot + 1) + converted.slice(firstDot + 1).replace(/\./g, '');
+      }
+      if (converted !== original) {
+        const cursorPos = inputEl.selectionStart;
+        const lengthDiff = converted.length - original.length;
+        inputEl.value = converted;
+        if (document.activeElement === inputEl && cursorPos !== null) {
+          const newPos = Math.max(0, cursorPos + lengthDiff);
+          try { inputEl.setSelectionRange(newPos, newPos); } catch (e) {}
+        }
+      }
+    }
+
+    function updateBottomNavActive(pageId) {
+      document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('nav-active'));
+      const map = { ai: 'navBtn-ai', offers: 'navBtn-offers', calculator: 'navBtn-calculator', favorites: 'navBtn-favorites' };
+      if (map[pageId]) {
+        const btn = document.getElementById(map[pageId]);
+        if (btn) btn.classList.add('nav-active');
+      }
+    }
+
+    function openVideoPage(videoId, title, returnTo) {
+      document.getElementById('videoPageTitle').innerText = title;
+      
+      const backBtn = document.getElementById('videoBackBtn');
+      backBtn.onclick = () => goBack();
+      backBtn.innerText = '❮ عودة';
+
+      navigateTo('video');
+
+      const iframe = document.getElementById('tiktokIframe');
+      const loader = document.getElementById('videoLoader');
+      if (loader) loader.style.display = 'flex';
+
+      if(videoId === '0' || !videoId) {
+        iframe.src = '';
+        if (loader) loader.style.display = 'none';
+        document.getElementById('videoPageTitle').innerText = title + " (قريباً)";
+      } else {
+        const embedUrl = `https://www.tiktok.com/player/v1/${videoId}?autoplay=1&music_info=1&description=1`;
+        iframe.src = embedUrl;
+        iframe.onload = () => { setTimeout(() => { if (loader) loader.style.display = 'none'; }, 900); };
+      }
+    }
+
+    function openImagePage(imageSrc, title, returnTo) {
+      document.getElementById('imagePageTitle').innerText = title;
+      const backBtn = document.getElementById('imageBackBtn');
+      backBtn.onclick = () => goBack();
+      document.getElementById('awardsImage').src = imageSrc || '';
+      navigateTo('image');
+    }
+
+    let currentIndex = 0;
+    const totalSlides = 5;
+    let autoplayTimer = null;
+    let dragStartX = 0;
+    let isDragging = false;
+
+    function moveSlide(direction) {
+      currentIndex += direction;
+      if (currentIndex < 0) {
+        currentIndex = totalSlides - 1;
+      } else if (currentIndex >= totalSlides) {
+        currentIndex = 0;
+      }
+      const slider = document.getElementById('slider');
+      slider.style.transition = 'transform 0.4s ease-in-out';
+      slider.style.transform = `translateX(${currentIndex * 100}%)`;
+    }
+
+    function startAutoplay() {
+      stopAutoplay();
+      autoplayTimer = setInterval(() => { moveSlide(1); }, 3000);
+    }
+
+    function stopAutoplay() {
+      if (autoplayTimer) {
+        clearInterval(autoplayTimer);
+        autoplayTimer = null;
+      }
+    }
+
+    function getPointerX(e) {
+      return e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+    }
+
+    function handleSliderDragStart(e) {
+      isDragging = true;
+      dragStartX = getPointerX(e);
+      const slider = document.getElementById('slider');
+      slider.style.transition = 'none';
+      stopAutoplay();
+    }
+
+    let sliderDragTicking = false;
+    function handleSliderDragMove(e) {
+      if (!isDragging) return;
+      const currentX = getPointerX(e);
+      if (sliderDragTicking) return;
+      sliderDragTicking = true;
+      requestAnimationFrame(() => {
+        const diff = dragStartX - currentX;
+        const containerWidth = document.getElementById('sliderContainer').offsetWidth;
+        const offsetPercent = (diff / containerWidth) * 100;
+        const slider = document.getElementById('slider');
+        slider.style.transform = `translateX(${currentIndex * 100 + offsetPercent}%)`;
+        sliderDragTicking = false;
+      });
+    }
+
+    function handleSliderDragEnd(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      const endX = e.changedTouches && e.changedTouches.length > 0 ? e.changedTouches[0].clientX : e.clientX;
+      const diff = dragStartX - endX;
+      const containerWidth = document.getElementById('sliderContainer').offsetWidth;
+      const threshold = containerWidth * 0.15;
+      const slider = document.getElementById('slider');
+      slider.style.transition = 'transform 0.4s ease-in-out';
+      if (diff > threshold) {
+        moveSlide(1);
+      } else if (diff < -threshold) {
+        moveSlide(-1);
+      } else {
+        slider.style.transform = `translateX(${currentIndex * 100}%)`;
+      }
+      startAutoplay();
+    }
+
+    function initSlider() {
+      const sliderContainer = document.getElementById('sliderContainer');
+      if(!sliderContainer) return;
+      sliderContainer.addEventListener('touchstart', handleSliderDragStart, { passive: true });
+      sliderContainer.addEventListener('touchmove', handleSliderDragMove, { passive: true });
+      sliderContainer.addEventListener('touchend', handleSliderDragEnd);
+      sliderContainer.addEventListener('mousedown', handleSliderDragStart);
+      document.addEventListener('mousemove', handleSliderDragMove);
+      document.addEventListener('mouseup', handleSliderDragEnd);
+      startAutoplay();
+    }
+
+    initSlider();
+
+    /* ===== إعداد المتصفح: سجل الصفحات + شريط التنقل ===== */
+    history.replaceState({ pageId: 'home' }, '', '#home');
+
+    (function initBottomNavScroll() {
+      const appContainer = document.getElementById('appContainer');
+      const bottomNav = document.getElementById('bottomNav');
+      if (!appContainer || !bottomNav) return;
+      let lastScrollTop = 0;
+      let scrollTicking = false;
+      appContainer.addEventListener('scroll', () => {
+        if (scrollTicking) return;
+        scrollTicking = true;
+        requestAnimationFrame(() => {
+          const scrollTop = appContainer.scrollTop;
+          if (scrollTop <= 20) {
+            bottomNav.classList.remove('nav-hidden');
+          } else if (scrollTop > lastScrollTop) {
+            bottomNav.classList.add('nav-hidden');
+          } else if (scrollTop < lastScrollTop) {
+            bottomNav.classList.remove('nav-hidden');
+          }
+          lastScrollTop = scrollTop;
+          scrollTicking = false;
+        });
+      }, { passive: true });
+    })();
+
+    /* ===== وسائل التواصل ===== */
+    function openSocialLinks() {
+      window.open('https://nasrllalan112-cmyk.github.io/JGS/', '_blank');
+    }
+
+    /* ===== العروض ===== */
+    function openOfferInquiry(offerName) {
+      const phoneNumber = "966555787068";
+      const message = `مرحباً، أرغب بالاستفسار عن: ${offerName} 🇸🇦`;
+      window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    }
+
+    /* ===== نظام الإعجابات (أعجاباتي) ===== */
+    const FAVORITES_KEY = 'nasser_favorites_v1';
+
+    function getFavorites() {
+      try {
+        return JSON.parse(localStorage.getItem(FAVORITES_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveFavorites(list) {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(list));
+    }
+
+    function toggleFavorite(event, id, name, icon) {
+      event.stopPropagation();
+      let list = getFavorites();
+      const exists = list.find(item => item.id === id);
+      if (exists) {
+        list = list.filter(item => item.id !== id);
+      } else {
+        list.push({ id, name, icon });
+      }
+      saveFavorites(list);
+      refreshFavoriteHearts();
+    }
+
+    function refreshFavoriteHearts() {
+      const list = getFavorites();
+      document.querySelectorAll('.card[data-fav-id]').forEach(card => {
+        const id = card.getAttribute('data-fav-id');
+        const heartBtn = card.querySelector('.like-heart-btn');
+        if (!heartBtn) return;
+        heartBtn.textContent = list.find(item => item.id === id) ? '💙' : '🤍';
+      });
+    }
+
+    function removeFavorite(id) {
+      let list = getFavorites().filter(item => item.id !== id);
+      saveFavorites(list);
+      renderFavoritesPage();
+      refreshFavoriteHearts();
+    }
+
+    const FAV_PAGE_MAP = {
+      cups: 'cups', stickers: 'stickers', banners: 'banners', acrylic: 'acrylic',
+      foam: 'foam', id_cards: 'id_cards', letterboards: 'letterboards', bags: 'bags',
+      awards: 'awards', pins: 'pins', brochures: 'brochures'
+    };
+
+    function renderFavoritesPage() {
+      const list = getFavorites();
+      const container = document.getElementById('favoritesList');
+      if (!list.length) {
+        container.innerHTML = '<div class="fav-empty">لم تقم بتسجيل أي إعجاب بعد 🤍<br>اضغط على أيقونة القلب على أي منتج لإضافته هنا</div>';
+        return;
+      }
+      let html = '';
+      list.forEach(item => {
+        const targetPage = FAV_PAGE_MAP[item.id];
+        const clickAttr = targetPage ? ` onclick="navigateTo('${targetPage}')" style="cursor:pointer;"` : '';
+        const hint = targetPage ? '<div class="fav-hint">اضغط لاختيار المقاس والكمية وإتمام الطلب ↩</div>' : '<div class="fav-hint">هذا القسم غير متاح للطلب حالياً</div>';
+        html += `<div class="fav-card"${clickAttr}>
+          <div class="fav-icon"><img src="${item.icon}" alt="" loading="lazy" decoding="async" onerror="this.style.display='none';"></div>
+          <div style="flex:1;">
+            <div class="fav-name">${item.name}</div>
+            ${hint}
+          </div>
+          <button class="fav-remove-btn" onclick="event.stopPropagation(); removeFavorite('${item.id}')">🗑️</button>
+        </div>`;
+      });
+      html += `<button class="fav-order-btn" onclick="orderAllFavorites()">📤 إتمام طلب الكل عبر واتساب</button>`;
+      container.innerHTML = html;
+    }
+
+    function orderAllFavorites() {
+      const list = getFavorites();
+      if (!list.length) return;
+      const phoneNumber = "966555787068";
+      let message = "مرحباً، أود طلب الأصناف التالية من قائمة إعجاباتي:\n";
+      list.forEach((item, i) => {
+        message += `${i + 1}. ${item.name}\n`;
+      });
+      message += "\nبرجاء إعلامي بالتفاصيل والأسعار.";
+      window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    }
+
+    refreshFavoriteHearts();
+
+    /* ===== ناصر AI ===== */
+    // مفتاح Groq API
+    const GROQ_API_KEY = "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";
+    const GROQ_MODEL = "qwen/qwen3.6-27b";
+
+    const AI_CATEGORY_MAP = {
+      "بوكسات": null,
+      "أكواب": "cups",
+      "استيكرات": "stickers",
+      "بنرات": "banners",
+      "أكرليك": "acrylic",
+      "كروت": null,
+      "تغريسات": null,
+      "فلين": "foam",
+      "إي دي": "id_cards",
+      "ايدي": "id_cards",
+      "لوحات حروف": "letterboards",
+      "بوكس مضيء": null,
+      "أكياس": "bags",
+      "دروع": "awards"
+    };
+
+    const AI_PRICE_KNOWLEDGE = `قائمة أسعار وخدمات وكالة ناصر للإعلان (استخدمها حرفياً في الرد على أي سؤال عن الأسعار، ولا تخترع أي سعر غير مذكور هنا):
+
+📦 أكواب:
+- أكواب ورقية: 12 أونز دبل 0.75 ريال، 8 أونز دبل 0.63 ريال، 7 أونز دبل 0.58 ريال، 4 أونز سنقل 0.52 ريال (شامل الضريبة، الكمية من 1000 إلى 10000)
+- أكواب تغليف استيكر: 12 أونز 3 ريال، 8 أونز 2 ريال، 7 أونز 2 ريال، 4 أونز 1 ريال (الكمية من 10 إلى 1000)
+- أكواب توزيعات استيكر: 12 أونز 4.5 ريال، 8 أونز 3.5 ريال، 7 أونز 3.5 ريال، 4 أونز 2 ريال (الكمية من 10 إلى 1000)
+- أكواب بلاستيك: 12 أونص 0.55 ريال، 16 أونص 0.60 ريال (الكمية من 1000 إلى 10000)
+
+🏷️ استيكرات:
+- استيكرات قص (مقصومة): تُحسب حسب المقاس بالسنتيمتر والكمية (يدخلها العميل في نموذج الطلب بالموقع)
+- استيكرات بدون قص: تُحسب حسب المقاس بالسنتيمتر والكمية
+- استيكرات يوفي (UV DTF): مقاس A3 بـ85 ريال، مقاس متر بـ180 ريال (شامل الضريبة)
+
+🖼️ بنرات:
+- بنر: يُحسب حسب المقاس (العرض × الارتفاع بالسم)، مع إضافات اختيارية: فريم حديد +50 ريال لكل متر، عمود +50 ريال لكل متر، التركيب حسب الموقع
+- رول أب: مقاس 200×85 سم بـ200 ريال شامل الضريبة
+- استاند بوابة: مقاس 180×80 سم بـ180 ريال شامل الضريبة
+
+🔷 أكرليك: سعر المتر المربع الثابت 350 ريال لكافة المقاسات (العرض × الارتفاع بالسم) بدون أي رسوم إضافية، شامل الضريبة
+
+🧊 فلين: طباعة وقص حسب المقاس (العرض × الارتفاع بالسم) والعدد
+
+🪪 إي دي: بطاقات وعروض إي دي، السعر حسب العدد المطلوب
+
+🔤 لوحات حروف: سعر المتر 60 ريال، مع إمكانية إضافة فريم أو عمود
+
+👜 أكياس: غير متوفرة للطلب حالياً
+
+🏆 دروع:
+- درع مع علبة: صغير 130 ريال، وسط 170 ريال، كبير 200 ريال
+- درع مع بوكس: صغير 150 ريال، وسط 280 ريال، كبير 350 ريال
+- درع سيف بوكس: شفاف 750 ريال، مغلق 700 ريال
+
+📌 بروشات: بروش يو في 25 ريال للحبة، بروش أكريليك 20 ريال للحبة، بروش معدن ذهبي 20 ريال للحبة (شامل الضريبة)
+
+📄 بروشورات: مقاسات A4 مطوي (ثلاث طيات)، A5، DL — الأسعار غير متاحة حالياً، يُرجى التواصل مباشرة للاستفسار
+
+⚠️ أقسام غير متوفرة حالياً للطلب من الموقع: بوكسات، كروت، تغريسات، بوكس مضيء (اذكر ذلك للعميل بوضوح إذا سأل عنها ولا تخترع لها أسعار)`;
+
+    const AI_SYSTEM_PROMPT = `أنت "ناصر AI"، المساعد الذكي الرسمي التابع حصرياً لوكالة ناصر للإعلان (طباعة وإعلانات - منطقة جازان). أقسام الوكالة هي فقط: بوكسات، أكواب، استيكرات، بنرات، أكرليك، كروت، تغريسات، فلين، إي دي، لوحات حروف، بوكس مضيء، أكياس، دروع، بروشات، بروشورات.
+
+${AI_PRICE_KNOWLEDGE}
+
+قواعد صارمة يجب اتباعها دائماً:
+1) لا تذكر أبداً اسم أي شركة تقنية أو مزود ذكاء اصطناعي (لا جوجل ولا جيميناي ولا أي اسم آخر). إذا سُئلت "من أنت" أو "ما اسمك" أو "أي متصفح/تقنية تستخدم"، أجب فقط: "أنا ناصر AI، مساعد وكالة ناصر للإعلان الذكي."
+2) إذا سأل العميل عن سعر أي منتج أو خدمة، أجب فوراً بالسعر الدقيق من قائمة الأسعار أعلاه فقط. لا تخترع أو تقدّر أي سعر غير موجود في القائمة. إذا كان السعر يعتمد على مقاس أو عدد يحدده العميل، وضّح له طريقة الحساب المذكورة، واطلب المقاس/العدد إن لم يذكرهما.
+3) إذا سأل العميل عن توفر خدمة أو منتج معين، تحقق من القائمة أعلاه وأخبره بوضوح إذا كانت متوفرة أو غير متوفرة حالياً على الموقع.
+4) أجب فقط على الأسئلة الخاصة بمنتجات وخدمات وكالة ناصر للإعلان وأسعارها وتفاصيلها ومقاساتها. إذا سأل العميل عن أي موضوع خارج هذا النطاق تماماً، اعتذر بلطف وأخبره أنك مخصص فقط لمساعدته في أمور الوكالة.
+5) إذا أرسل العميل صورة منتج، حدد بدقة إلى أي قسم من الأقسام أعلاه ينتمي المنتج، واكتب في أول سطر من ردك بالضبط: "القسم: <اسم القسم>" حيث اسم القسم واحد من القائمة أعلاه حرفياً، ثم اذكر سعره من القائمة أعلاه إن وُجد.
+6) إذا لم تستطع تحديد القسم من الصورة، اذكر ذلك بأدب واطلب توضيحاً.
+7) كن ودوداً ومباشراً ومختصراً جداً (لا تكتب فقرات طويلة، اذهب للسعر أو الإجابة مباشرة)، واستخدم اللهجة العربية الفصحى المبسطة أو العامية الخفيفة المناسبة لعميل سعودي.`;
+
+    let aiChatHistory = [];
+
+    function appendAiBubble(role, contentHtml) {
+      const messages = document.getElementById('aiMessages');
+      const bubble = document.createElement('div');
+      bubble.className = 'ai-bubble ' + (role === 'user' ? 'user' : 'bot');
+      bubble.innerHTML = contentHtml;
+      messages.appendChild(bubble);
+      messages.scrollTop = messages.scrollHeight;
+      return bubble;
+    }
+
+    function showAiTyping() {
+      const messages = document.getElementById('aiMessages');
+      const typing = document.createElement('div');
+      typing.className = 'ai-typing';
+      typing.id = 'aiTypingIndicator';
+      typing.innerHTML = '<span></span><span></span><span></span>';
+      messages.appendChild(typing);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function hideAiTyping() {
+      const el = document.getElementById('aiTypingIndicator');
+      if (el) el.remove();
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    async function sendAiText() {
+      const input = document.getElementById('aiTextInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      appendAiBubble('user', escapeHtml(text));
+      await callGroqAI(text, null);
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleAiImageFile(file) {
+      if (!file) return;
+      const previewUrl = URL.createObjectURL(file);
+      appendAiBubble('user', `<img class="ai-preview-img" src="${previewUrl}" alt="صورة"> صورة مرفقة`);
+      const base64Data = await fileToBase64(file);
+      await callGroqAI("حدد قسم هذا المنتج من أقسام الوكالة.", { data: base64Data, mimeType: file.type || 'image/jpeg' });
+    }
+
+    async function callGroqAI(userText, imagePart) {
+      showAiTyping();
+      try {
+        if (!GROQ_API_KEY || GROQ_API_KEY.indexOf('ضع_') === 0) {
+          hideAiTyping();
+          appendAiBubble('bot', 'خدمة ناصر AI غير مفعّلة بعد على هذا الجهاز. يرجى إضافة مفتاح التفعيل من الإعدادات.');
+          return;
+        }
+
+        let userContent;
+        if (imagePart) {
+          userContent = [
+            { type: 'text', text: userText },
+            { type: 'image_url', image_url: { url: `data:${imagePart.mimeType};base64,${imagePart.data}` } }
+          ];
+        } else {
+          userContent = userText;
+        }
+
+        aiChatHistory.push({ role: 'user', content: userContent });
+
+        const trimmedHistory = aiChatHistory.slice(-10);
+
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${GROQ_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: GROQ_MODEL,
+            messages: [
+              { role: 'system', content: AI_SYSTEM_PROMPT },
+              ...trimmedHistory
+            ],
+            max_tokens: 400,
+            temperature: 0.7,
+            reasoning_effort: 'none',
+            reasoning_format: 'hidden' 
+          })
+        });
+
+        const data = await response.json();
+        hideAiTyping();
+
+        if (!response.ok || data.error) {
+          console.error('Groq API error:', data.error || data);
+          const errType = data?.error?.type || data?.error?.code || '';
+          const httpCode = response.status;
+          let friendlyMsg;
+          if (httpCode === 429 || errType === 'rate_limit_exceeded') {
+            friendlyMsg = 'عذراً، عدد المحاولات المسموح بها لخدمة ناصر AI الآن انتهى مؤقتاً 🙏 يرجى المحاولة بعد قليل، أو تواصل معنا مباشرة عبر واتساب لطلبك.';
+          } else if (httpCode === 401 || httpCode === 403) {
+            friendlyMsg = 'تعذر الاتصال بخدمة ناصر AI حالياً (خطأ في مفتاح التفعيل). يرجى مراجعة الإدارة.';
+          } else {
+            const apiMsg = data?.error?.message || data?.error?.code || '';
+            friendlyMsg = apiMsg
+              ? `تعذر الاتصال بخدمة ناصر AI.<br><small style="direction:ltr;display:block;opacity:.75;">${escapeHtml(String(apiMsg))}</small>`
+              : 'تعذر الاتصال بخدمة ناصر AI حالياً، يرجى المحاولة لاحقاً.';
+          }
+          appendAiBubble('bot', friendlyMsg);
+          aiChatHistory.pop();
+          return;
+        }
+
+        let replyText = data?.choices?.[0]?.message?.content;
+        // حماية إضافية: إذا أعاد المزود وسوم التفكير رغم إعداد الإخفاء، لا نعرضها للعميل.
+        if (typeof replyText === 'string') {
+          replyText = replyText.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+        }
+        if (!replyText) {
+          console.error('Groq API: unexpected response shape:', data);
+          appendAiBubble('bot', 'عذراً، لم أتمكن من فهم طلبك، حاول مرة أخرى.');
+          aiChatHistory.pop();
+          return;
+        }
+        aiChatHistory.push({ role: 'assistant', content: replyText });
+
+        let matchedCategory = null;
+        let matchedPageId = null;
+        for (const catName in AI_CATEGORY_MAP) {
+          if (replyText.indexOf(catName) !== -1) {
+            matchedCategory = catName;
+            matchedPageId = AI_CATEGORY_MAP[catName];
+            break;
+          }
+        }
+
+        let bubbleHtml = escapeHtml(replyText).replace(/\n/g, '<br>');
+        if (matchedPageId) {
+          bubbleHtml += `<br><button class="ai-goto-btn" onclick="navigateTo('${matchedPageId}')">الانتقال إلى قسم ${matchedCategory} ↩</button>`;
+        }
+        appendAiBubble('bot', bubbleHtml);
+      } catch (err) {
+        hideAiTyping();
+        console.error('Groq API request failed:', err);
+        const msg = err?.message ? String(err.message) : 'خطأ غير معروف';
+        appendAiBubble('bot', `تعذر الاتصال بخدمة ناصر AI.<br><small style="direction:ltr;display:block;opacity:.75;">${escapeHtml(msg)}</small>`);
+        if (aiChatHistory.length && aiChatHistory[aiChatHistory.length - 1]?.role === 'user') {
+          aiChatHistory.pop();
+        }
+      }
+    }
+
+    (function initAiInputs() {
+      const uploadBtn = document.getElementById('aiUploadBtn');
+      const cameraBtn = document.getElementById('aiCameraBtn');
+      const fileInput = document.getElementById('aiFileInput');
+      const cameraInput = document.getElementById('aiCameraInput');
+      if (!uploadBtn || !cameraBtn) return;
+
+      uploadBtn.addEventListener('click', () => fileInput.click());
+      cameraBtn.addEventListener('click', () => cameraInput.click());
+      fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) handleAiImageFile(e.target.files[0]);
+        e.target.value = '';
+      });
+      cameraInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) handleAiImageFile(e.target.files[0]);
+        e.target.value = '';
+      });
+    })();
+
+    function toggleMenu() {
+      const menu = document.getElementById('sideMenu');
+      const overlay = document.getElementById('overlay');
+      menu.classList.toggle('active');
+      overlay.classList.toggle('active');
+    }
+
+    const productsData = {
+      cups: {
+        paper: {
+          title: "أكواب ورقية",
+          qtyMode: 'select',
+          minQty: 1000,
+          maxQty: 10000,
+          qtyStep: 1000,
+          note: "شامل الضريبة",
+          sizes: [
+            { name: "12 أونز دبل", unit: 0.75 },
+            { name: "8 أونز دبل", unit: 0.63 },
+            { name: "7 أونز دبل", unit: 0.58 },
+            { name: "4 أونز سنقل", unit: 0.52 }
+          ]
+        },
+        wrap: {
+          title: "أكواب تغليف استيكر",
+          qtyMode: 'input',
+          minQty: 10,
+          maxQty: 1000,
+          note: "شامل الضريبة",
+          sizes: [
+            { name: "12 أونز", unit: 3.00 },
+            { name: "8 أونز", unit: 2.00 },
+            { name: "7 أونز", unit: 2.00 },
+            { name: "4 أونز", unit: 1.00 }
+          ]
+        },
+        sticker: {
+          title: "أكواب توزيعات استيكر",
+          qtyMode: 'input',
+          minQty: 10,
+          maxQty: 1000,
+          note: "شامل الضريبة",
+          sizes: [
+            { name: "12 أونز", unit: 4.50 },
+            { name: "8 أونز", unit: 3.50 },
+            { name: "7 أونز", unit: 3.50 },
+            { name: "4 أونز", unit: 2.00 }
+          ]
+        },
+        plastic: {
+          title: "أكواب بلاستيك",
+          qtyMode: 'select',
+          minQty: 1000,
+          maxQty: 10000,
+          qtyStep: 1000,
+          note: "شامل الضريبة",
+          sizes: [
+            { name: "12 أونص", unit: 0.55 },
+            { name: "16 أونص", unit: 0.60 }
+          ]
+        }
+      },
+      stickers: {
+        uv: {
+          title: "استيكرات يوفي (UV DTF)",
+          options: [
+            { name: "مقاس A3", qty: 1, total: 85.00, unit: 85.00, note: "شامل الضريبة" },
+            { name: "مقاس متر", qty: 1, total: 180.00, unit: 180.00, note: "شامل الضريبة" }
+          ]
+        }
+      },
+      banners: {
+        rollup: {
+          title: "رول أب",
+          options: [
+            { name: "مقاس (200 × 85 سم)", qty: 1, total: 200.00, unit: 200.00, note: "شامل الضريبة" }
+          ]
+        },
+        gate_stand: {
+          title: "استاند بوابة",
+          options: [
+            { name: "مقاس (180 × 80 سم)", qty: 1, total: 180.00, unit: 180.00, note: "شامل الضريبة" }
+          ]
+        }
+      },
+      awards: {
+        case: {
+          title: "درع مع علبة",
+          options: [
+            { name: "صغير", qty: 1, total: 130.00, unit: 130.00, note: "شامل الضريبة" },
+            { name: "وسط", qty: 1, total: 170.00, unit: 170.00, note: "شامل الضريبة" },
+            { name: "كبير", qty: 1, total: 200.00, unit: 200.00, note: "شامل الضريبة" }
+          ]
+        },
+        box: {
+          title: "درع مع بوكس",
+          options: [
+            { name: "صغير", qty: 1, total: 150.00, unit: 150.00, note: "شامل الضريبة" },
+            { name: "وسط", qty: 1, total: 280.00, unit: 280.00, note: "شامل الضريبة" },
+            { name: "كبير", qty: 1, total: 350.00, unit: 350.00, note: "شامل الضريبة" }
+          ]
+        },
+        swordbox: {
+          title: "درع سيف بوكس",
+          options: [
+            { name: "شفاف", qty: 1, total: 750.00, unit: 750.00, note: "شامل الضريبة" },
+            { name: "مغلق", qty: 1, total: 700.00, unit: 700.00, note: "شامل الضريبة" }
+          ]
+        }
+      },
+      pins: {
+        uv: { title: "بروش يو في", unit: 25.00, note: "شامل الضريبة" },
+        acrylic: { title: "بروش أكريليك", unit: 20.00, note: "شامل الضريبة" },
+        metal: { title: "بروش معدن ذهبي", unit: 20.00, note: "شامل الضريبة" }
+      },
+      brochures: {
+        main: {
+          title: "بروشورات دعائية",
+          sizes: [
+            { name: "A4 مطوي (ثلاث طيات)" },
+            { name: "A5" },
+            { name: "DL" }
+          ]
+        }
+      }
+    };
+
+    function openModal(group, key) {
+      currentCategoryGroup = group;
+      currentCategoryKey = key;
+      
+      const acrylicForm = document.getElementById('acrylicForm');
+      const foamForm = document.getElementById('foamForm');
+      const idCardsForm = document.getElementById('idCardsForm');
+      const bagsForm = document.getElementById('bagsForm');
+      const cutForm = document.getElementById('cutStickerForm');
+      const uncutForm = document.getElementById('uncutStickerForm');
+      const bannerDimForm = document.getElementById('bannerDimensionForm');
+      const selectForm = document.getElementById('selectStickerForm');
+      const bannerOptionsGroup = document.getElementById('bannerOptionsGroup');
+      const letterBoardForm = document.getElementById('letterBoardForm');
+      const cupsForm = document.getElementById('cupsForm');
+      const pinsForm = document.getElementById('pinsForm');
+      const brochuresForm = document.getElementById('brochuresForm');
+      const priceDetailsBox = document.getElementById('priceDetailsBox');
+      const submitOrderBtn = document.getElementById('submitOrderBtn');
+
+      acrylicForm.style.display = 'none';
+      foamForm.style.display = 'none';
+      idCardsForm.style.display = 'none';
+      bagsForm.style.display = 'none';
+      cutForm.style.display = 'none';
+      uncutForm.style.display = 'none';
+      bannerDimForm.style.display = 'none';
+      selectForm.style.display = 'none';
+      letterBoardForm.style.display = 'none';
+      cupsForm.style.display = 'none';
+      pinsForm.style.display = 'none';
+      brochuresForm.style.display = 'none';
+      priceDetailsBox.style.display = 'block';
+      submitOrderBtn.style.display = 'block';
+
+      if (group === 'acrylic') {
+        document.getElementById('modalTitle').innerText = "لوحات وشاشات أكرليك";
+        acrylicForm.style.display = 'block';
+        calculateAcrylicPrice();
+      } else if (group === 'foam') {
+        document.getElementById('modalTitle').innerText = "طباعة وقص فلين";
+        foamForm.style.display = 'block';
+        calculateFoamPrice();
+      } else if (group === 'id_cards') {
+        document.getElementById('modalTitle').innerText = "بطاقات وعروض إي دي";
+        idCardsForm.style.display = 'block';
+        calculateIdPrice();
+      } else if (group === 'bags') {
+        document.getElementById('modalTitle').innerText = "أكياس مطبوعة";
+        bagsForm.style.display = 'block';
+        priceDetailsBox.style.display = 'none';
+        submitOrderBtn.style.display = 'none';
+        currentCalculatedData = { name: "أكياس مطبوعة", qty: 0, total: 0, unit: 0, note: "غير متوفر في الوقت الحالي" };
+      } else if (group === 'stickers' && key === 'cut') {
+        document.getElementById('modalTitle').innerText = "استيكرات قص (مقصومة)";
+        cutForm.style.display = 'block';
+        calculateCutStickerPrice();
+      } else if (group === 'stickers' && key === 'uncut') {
+        document.getElementById('modalTitle').innerText = "استيكرات بدون قص";
+        uncutForm.style.display = 'block';
+        calculateUncutStickerPrice();
+      } else if (group === 'stickers' && key === 'uv') {
+        selectForm.style.display = 'block';
+        const data = productsData.stickers.uv;
+        document.getElementById('modalTitle').innerText = data.title;
+        const select = document.getElementById('sizeSelect');
+        select.innerHTML = '';
+        data.options.forEach((opt, index) => {
+          const optionEl = document.createElement('option');
+          optionEl.value = index;
+          optionEl.innerText = opt.name;
+          select.appendChild(optionEl);
+        });
+        updatePrice();
+      } else if (group === 'banners' && key === 'with_iron') {
+        document.getElementById('modalTitle').innerText = "بنر";
+        bannerDimForm.style.display = 'block';
+        bannerOptionsGroup.style.display = 'block';
+        document.getElementById('addIronFrame').checked = false;
+        document.getElementById('addColumn').checked = false;
+        document.getElementById('addInstallation').checked = false;
+        calculateBannerPrice();
+      } else if (group === 'letterboards' && key === 'main') {
+        document.getElementById('modalTitle').innerText = "لوحة حروف";
+        letterBoardForm.style.display = 'block';
+        calculateLetterBoardPrice();
+      } else if (group === 'cups') {
+        document.getElementById('modalTitle').innerText = productsData.cups[key].title;
+        cupsForm.style.display = 'block';
+        populateCupsForm(key);
+      } else if (group === 'pins') {
+        document.getElementById('modalTitle').innerText = productsData.pins[key].title;
+        pinsForm.style.display = 'block';
+        calculatePinPrice();
+      } else if (group === 'brochures') {
+        document.getElementById('modalTitle').innerText = "بروشورات دعائية";
+        brochuresForm.style.display = 'block';
+        calculateBrochurePrice();
+      } else {
+        selectForm.style.display = 'block';
+        const data = productsData[group][key];
+        document.getElementById('modalTitle').innerText = data.title;
+        const select = document.getElementById('sizeSelect');
+        select.innerHTML = '';
+        const hidePriceInSize = (group === 'banners');
+        data.options.forEach((opt, index) => {
+          const optionEl = document.createElement('option');
+          optionEl.value = index;
+          optionEl.innerText = hidePriceInSize ? opt.name : `${opt.name} - (${opt.total} ريال)`;
+          select.appendChild(optionEl);
+        });
+        updatePrice();
+      }
+
+      document.getElementById('modalOverlay').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+
+    function calculateAcrylicPrice() {
+      let width = parseFloat(document.getElementById('acrylicWidth').value) || 0;
+      let height = parseFloat(document.getElementById('acrylicHeight').value) || 0;
+      let qty = parseInt(document.getElementById('acrylicQuantity').value) || 0;
+
+      if (width <= 0 || height <= 0 || qty <= 0) {
+        document.getElementById('qtyDisplay').innerText = "0 قطعة";
+        document.getElementById('unitPriceDisplay').innerText = "0.00 ريال";
+        document.getElementById('totalPriceDisplay').innerText = "0.00 ريال";
+        return;
+      }
+
+      const widthM = width / 100;
+      const heightM = height / 100;
+      const areaSqm = widthM * heightM;
+      const unitPrice = parseFloat((areaSqm * 350).toFixed(2));
+      const totalPrice = parseFloat((unitPrice * qty).toFixed(2));
+      const noteText = "شامل الضريبة";
+
+      currentCalculatedData = {
+        name: `أكرليك (${width} × ${height} سم)`,
+        qty: qty,
+        total: totalPrice,
+        unit: unitPrice,
+        note: noteText
+      };
+
+      document.getElementById('qtyDisplay').innerText = qty + ' قطعة';
+      document.getElementById('unitPriceDisplay').innerText = unitPrice.toFixed(2) + ' ريال';
+      document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString() + ' ريال';
+    }
+
+    function calculateFoamPrice() {
+      const width = parseFloat(document.getElementById('foamWidth').value) || 0;
+      const height = parseFloat(document.getElementById('foamHeight').value) || 0;
+
+      if (width <= 0 || height <= 0) {
+        document.getElementById('qtyDisplay').innerText = "0 م²";
+        document.getElementById('unitPriceDisplay').innerText = "0.00 ريال";
+        document.getElementById('totalPriceDisplay').innerText = "0.00 ريال";
+        return;
+      }
+
+      const squareMeters = (width * height) / 10000;
+      let totalPrice = squareMeters * 120;
+
+      let isSmallerThanA4 = (width <= 21 && height <= 30) || (width <= 30 && height <= 21) || (squareMeters < 0.0623);
+      
+      let noteText = "شامل الضريبة";
+      if (isSmallerThanA4) {
+        totalPrice += 15;
+        noteText = "شامل الضريبة + 15 ريال ثابته (مقاس أقل من A4)";
+      }
+
+      totalPrice = parseFloat(totalPrice.toFixed(2));
+
+      currentCalculatedData = {
+        name: `فلين مقاس (${width}×${height} سم)`,
+        qty: 1,
+        total: totalPrice,
+        unit: totalPrice,
+        note: noteText
+      };
+
+      document.getElementById('qtyDisplay').innerText = squareMeters.toFixed(2) + ' متر مربع';
+      document.getElementById('unitPriceDisplay').innerText = totalPrice.toFixed(2) + ' ريال';
+      document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString() + ' ريال';
+    }
+
+    function calculateIdPrice() {
+      const quantity = parseInt(document.getElementById('idQuantity').value) || 0;
+      const unitPrice = 20.00;
+      const totalPrice = parseFloat((quantity * unitPrice).toFixed(2));
+
+      currentCalculatedData = {
+        name: "بطاقة إي دي",
+        qty: quantity,
+        total: totalPrice,
+        unit: unitPrice,
+        note: "شامل الضريبة"
+      };
+
+      document.getElementById('qtyDisplay').innerText = quantity.toLocaleString() + ' حبة';
+      document.getElementById('unitPriceDisplay').innerText = unitPrice.toFixed(2) + ' ريال';
+      document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString() + ' ريال';
+    }
+
+    function populateCupsForm(key) {
+      const data = productsData.cups[key];
+      const sizeSelect = document.getElementById('cupSizeSelect');
+      sizeSelect.innerHTML = '';
+      data.sizes.forEach((s, idx) => {
+        const optionEl = document.createElement('option');
+        optionEl.value = idx;
+        optionEl.innerText = s.name;
+        sizeSelect.appendChild(optionEl);
+      });
+
+      const qtySelectGroup = document.getElementById('cupQtySelectGroup');
+      const qtyInputGroup = document.getElementById('cupQtyInputGroup');
+      const qtySelect = document.getElementById('cupQtySelect');
+      const qtyInput = document.getElementById('cupQtyInput');
+
+      if (data.qtyMode === 'select') {
+        qtySelectGroup.style.display = 'block';
+        qtyInputGroup.style.display = 'none';
+        qtySelect.innerHTML = '';
+        for (let q = data.minQty; q <= data.maxQty; q += data.qtyStep) {
+          const optionEl = document.createElement('option');
+          optionEl.value = q;
+          optionEl.innerText = q.toLocaleString() + ' حبة';
+          qtySelect.appendChild(optionEl);
+        }
+      } else {
+        qtySelectGroup.style.display = 'none';
+        qtyInputGroup.style.display = 'block';
+        qtyInput.min = data.minQty;
+        qtyInput.max = data.maxQty;
+        qtyInput.value = data.minQty;
+        qtyInput.placeholder = `من ${data.minQty} إلى ${data.maxQty}`;
+      }
+      calculateCupsPrice();
+    }
+
+    function calculateCupsPrice() {
+      const data = productsData.cups[currentCategoryKey];
+      const sizeIndex = document.getElementById('cupSizeSelect').value;
+      const size = data.sizes[sizeIndex];
+
+      let quantity;
+      if (data.qtyMode === 'select') {
+        quantity = parseInt(document.getElementById('cupQtySelect').value) || 0;
+      } else {
+        quantity = parseInt(document.getElementById('cupQtyInput').value) || 0;
+        if (quantity > 0) {
+          quantity = Math.min(Math.max(quantity, data.minQty), data.maxQty);
+        }
+      }
+
+      if (!size || quantity <= 0) {
+        document.getElementById('qtyDisplay').innerText = "0 حبة";
+        document.getElementById('unitPriceDisplay').innerText = "0.00 ريال";
+        document.getElementById('totalPriceDisplay').innerText = "0.00 ريال";
+        return;
+      }
+
+      const totalPrice = parseFloat((size.unit * quantity).toFixed(2));
+
+      currentCalculatedData = {
+        name: `${data.title} - ${size.name}`,
+        qty: quantity,
+        total: totalPrice,
+        unit: size.unit,
+        note: data.note
+      };
+
+      document.getElementById('qtyDisplay').innerText = quantity.toLocaleString() + ' حبة';
+      document.getElementById('unitPriceDisplay').innerText = size.unit.toFixed(2) + ' ريال';
+      document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString() + ' ريال (' + data.note + ')';
+    }
+
+    function calculateCutStickerPrice() {
+      const width = parseFloat(document.getElementById('stickerWidth').value) || 0;
+      const height = parseFloat(document.getElementById('stickerHeight').value) || 0;
+      const quantity = parseInt(document.getElementById('stickerQuantity').value) || 0;
+
+      if (width <= 0 || height <= 0 || quantity <= 0) {
+        document.getElementById('qtyDisplay').innerText = "0 حبة";
+        document.getElementById('unitPriceDisplay').innerText = "0.00 ريال";
+        document.getElementById('totalPriceDisplay').innerText = "0.00 ريال";
+        return;
+      }
+
+      const actualWidth = width + 0.6;
+      const actualHeight = height + 0.6;
+
+      const itemsPerRow = Math.floor(100 / actualWidth);
+      const itemsPerCol = Math.floor(100 / actualHeight);
+      const itemsPerMeter = itemsPerRow * itemsPerCol;
+
+      if (itemsPerMeter <= 0) {
+        document.getElementById('qtyDisplay').innerText = quantity.toLocaleString() + ' حبة';
+        document.getElementById('unitPriceDisplay').innerText = "0.00 ريال";
+        document.getElementById('totalPriceDisplay').innerText = "المقاس كبير جداً للمتر المربع";
+        return;
+      }
+
+      const squareMetersNeeded = Math.ceil((quantity / itemsPerMeter) * 100) / 100;
+      const meterRate = 80;
+      
+      const totalPrice = parseFloat((squareMetersNeeded * meterRate).toFixed(2));
+      const unitPrice = totalPrice / quantity;
+
+      currentCalculatedData = {
+        name: `مقاس (${width}×${height} سم)`,
+        qty: quantity,
+        total: totalPrice,
+        unit: unitPrice,
+        note: "شامل الضريبة والقص"
+      };
+
+      document.getElementById('qtyDisplay').innerText = quantity.toLocaleString() + ' حبة';
+      document.getElementById('unitPriceDisplay').innerText = unitPrice.toFixed(2) + ' ريال';
+      document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString() + ' ريال (شامل الضريبة والقص)';
+    }
+
+    function calculateUncutStickerPrice() {
+      const width = parseFloat(document.getElementById('uncutWidth').value) || 0;
+      const height = parseFloat(document.getElementById('uncutHeight').value) || 0;
+      const quantity = parseInt(document.getElementById('uncutQuantity').value) || 0;
+
+      if (width <= 0 || height <= 0 || quantity <= 0) {
+        document.getElementById('qtyDisplay').innerText = "0 حبة";
+        document.getElementById('unitPriceDisplay').innerText = "0.00 ريال";
+        document.getElementById('totalPriceDisplay').innerText = "0.00 ريال";
+        return;
+      }
+
+      const squareMeters = (width * height) / 10000;
+      const totalSquareMeters = squareMeters * quantity;
+      const meterRate = 60;
+
+      const totalPrice = parseFloat((totalSquareMeters * meterRate).toFixed(2));
+      const unitPrice = quantity > 0 ? totalPrice / quantity : 0;
+
+      currentCalculatedData = {
+        name: `مقاس (${width}×${height} سم)`,
+        qty: quantity,
+        total: totalPrice,
+        unit: unitPrice,
+        note: "شامل الضريبة"
+      };
+
+      document.getElementById('qtyDisplay').innerText = quantity.toLocaleString() + ' حبة';
+      document.getElementById('unitPriceDisplay').innerText = unitPrice.toFixed(2) + ' ريال';
+      document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString() + ' ريال (شامل الضريبة)';
+    }
+
+    function calculateBannerPrice() {
+      const width = parseFloat(document.getElementById('bannerWidth').value) || 0;
+      const height = parseFloat(document.getElementById('bannerHeight').value) || 0;
+
+      if (width <= 0 || height <= 0) {
+        document.getElementById('qtyDisplay').innerText = "1 بنر";
+        document.getElementById('unitPriceDisplay').innerText = "0.00 ريال";
+        document.getElementById('totalPriceDisplay').innerText = "0.00 ريال";
+        return;
+      }
+
+      const squareMeters = (width * height) / 10000;
+      let ratePerMeter = 60;
+
+      let extrasDescription = [];
+      if (document.getElementById('addIronFrame').checked) {
+        ratePerMeter += 50;
+        extrasDescription.push("مع فريم حديد");
+      }
+      if (document.getElementById('addColumn').checked) {
+        ratePerMeter += 50;
+        extrasDescription.push("مع عمود");
+      }
+      if (document.getElementById('addInstallation').checked) {
+        extrasDescription.push("مع تركيب");
+      }
+
+      const totalPrice = parseFloat((squareMeters * ratePerMeter).toFixed(2));
+
+      currentCalculatedData = {
+        name: `مقاس (${width}×${height} سم) [المساحة: ${squareMeters.toFixed(2)} م²] ${extrasDescription.length > 0 ? '- الإضافات: ' + extrasDescription.join(', ') : ''}`,
+        qty: 1,
+        total: totalPrice,
+        unit: totalPrice,
+        note: "شامل الضريبة"
+      };
+
+      document.getElementById('qtyDisplay').innerText = '1 بنر (' + squareMeters.toFixed(2) + ' متر مربع)';
+      document.getElementById('unitPriceDisplay').innerText = totalPrice.toFixed(2) + ' ريال';
+      document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString() + ' ريال';
+    }
+
+    function calculateLetterBoardPrice() {
+      const width = parseFloat(document.getElementById('letterBoardWidth').value) || 0;
+      if (width <= 0) {
+        document.getElementById('qtyDisplay').innerText = "0 لوحة";
+        document.getElementById('unitPriceDisplay').innerText = "0.00 ريال";
+        document.getElementById('totalPriceDisplay').innerText = "0.00 ريال";
+        return;
+      }
+
+      const billedWidth = Math.max(width, 0.5);
+      const ratePerMeter = 500;
+      const totalPrice = parseFloat((billedWidth * ratePerMeter).toFixed(2));
+
+      currentCalculatedData = {
+        name: `لوحة حروف (العرض: ${width} متر)`,
+        qty: 1,
+        total: totalPrice,
+        unit: totalPrice,
+        note: "شامل التركيب والضريبة وضمان 6 أشهر"
+      };
+
+      document.getElementById('qtyDisplay').innerText = '1 لوحة';
+      document.getElementById('unitPriceDisplay').innerText = totalPrice.toFixed(2) + ' ريال';
+      document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString() + ' ريال (شامل التركيب وضمان 6 أشهر)';
+    }
+
+    function calculatePinPrice() {
+      const qty = parseInt(document.getElementById('pinsQuantity').value) || 0;
+      const data = productsData.pins[currentCategoryKey];
+      if (qty <= 0) {
+        document.getElementById('qtyDisplay').innerText = "0 حبة";
+        document.getElementById('unitPriceDisplay').innerText = "0.00 ريال";
+        document.getElementById('totalPriceDisplay').innerText = "0.00 ريال";
+        return;
+      }
+      const totalPrice = parseFloat((qty * data.unit).toFixed(2));
+      currentCalculatedData = {
+        name: data.title,
+        qty: qty,
+        total: totalPrice,
+        unit: data.unit,
+        note: data.note
+      };
+      document.getElementById('qtyDisplay').innerText = qty.toLocaleString() + ' حبة';
+      document.getElementById('unitPriceDisplay').innerText = data.unit.toFixed(2) + ' ريال';
+      document.getElementById('totalPriceDisplay').innerText = totalPrice.toLocaleString() + ' ريال';
+    }
+
+    function calculateBrochurePrice() {
+      const sizeSelect = document.getElementById('brochureSizeSelect');
+      const qty = parseInt(document.getElementById('brochureQuantity').value) || 0;
+      const sizeName = productsData.brochures.main.sizes[sizeSelect.value].name;
+
+      currentCalculatedData = {
+        name: `بروشورات دعائية (${sizeName})`,
+        qty: qty,
+        total: 0,
+        unit: 0,
+        note: "الأسعار غير متاحة حالياً"
+      };
+
+      document.getElementById('qtyDisplay').innerText = qty.toLocaleString() + ' حبة';
+      document.getElementById('unitPriceDisplay').innerText = "الأسعار غير متاحة حالياً";
+      document.getElementById('totalPriceDisplay').innerText = "الأسعار غير متاحة حالياً";
+    }
+
+    function updatePrice() {
+      const select = document.getElementById('sizeSelect');
+      const selectedIndex = select.value;
+      const groupData = currentCategoryGroup === 'stickers' && currentCategoryKey === 'uv' ? productsData.stickers.uv : productsData[currentCategoryGroup][currentCategoryKey];
+      const selectedOption = groupData.options[selectedIndex];
+
+      document.getElementById('qtyDisplay').innerText = selectedOption.qty.toLocaleString() + ' حبة';
+      document.getElementById('unitPriceDisplay').innerText = selectedOption.unit.toFixed(2) + ' ريال';
+      document.getElementById('totalPriceDisplay').innerText = selectedOption.total.toLocaleString() + ' ريال (' + selectedOption.note + ')';
+    }
+
+    function sendToWhatsApp() {
+      const phoneNumber = "966555787068";
+      let selectedOption = currentCalculatedData;
+      let categoryTitle = "";
+
+      if (currentCategoryGroup === 'acrylic') {
+        categoryTitle = "لوحات وشاشات أكرليك";
+      } else if (currentCategoryGroup === 'foam') {
+        categoryTitle = "طباعة وقص فلين";
+      } else if (currentCategoryGroup === 'id_cards') {
+        categoryTitle = "بطاقات وعروض إي دي";
+      } else if (currentCategoryGroup === 'stickers' && currentCategoryKey === 'cut') {
+        categoryTitle = "استيكرات قص (مقصومة)";
+      } else if (currentCategoryGroup === 'stickers' && currentCategoryKey === 'uncut') {
+        categoryTitle = "استيكرات بدون قص";
+      } else if (currentCategoryGroup === 'stickers' && currentCategoryKey === 'uv') {
+        categoryTitle = "استيكرات يوفي (UV DTF)";
+        const select = document.getElementById('sizeSelect');
+        selectedOption = productsData.stickers.uv.options[select.value];
+      } else if (currentCategoryGroup === 'banners' && currentCategoryKey === 'with_iron') {
+        categoryTitle = "بنر";
+      } else if (currentCategoryGroup === 'letterboards' && currentCategoryKey === 'main') {
+        categoryTitle = "لوحة حروف";
+      } else if (currentCategoryGroup === 'cups') {
+        categoryTitle = productsData.cups[currentCategoryKey].title;
+      } else if (currentCategoryGroup === 'pins') {
+        categoryTitle = productsData.pins[currentCategoryKey].title;
+      } else if (currentCategoryGroup === 'brochures') {
+        categoryTitle = "بروشورات دعائية";
+      } else if (currentCategoryGroup && currentCategoryKey && productsData[currentCategoryGroup] && productsData[currentCategoryGroup][currentCategoryKey]) {
+        const select = document.getElementById('sizeSelect');
+        const selectedIndex = select ? select.value : 0;
+        selectedOption = productsData[currentCategoryGroup][currentCategoryKey].options[selectedIndex];
+        categoryTitle = productsData[currentCategoryGroup][currentCategoryKey].title;
+      }
+
+      const priceLine = currentCategoryGroup === 'brochures'
+        ? `💰 السعر: الأسعار غير متاحة حالياً`
+        : `💰 السعر الإجمالي: ${selectedOption.total} ريال (${selectedOption.note || ''})`;
+
+      const message = `مرحباً، أود طلب الصنف التالي:\n` +
+                      `📌 القسم: ${categoryTitle}\n` +
+                      `📏 التفاصيل/المقاس: ${selectedOption.name}\n` +
+                      `🔢 الكمية: ${selectedOption.qty} حبة\n` +
+                      priceLine;
+
+      const encodedMessage = encodeURIComponent(message);
+      window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+    }
+  </script>
+</body>
+</html>
