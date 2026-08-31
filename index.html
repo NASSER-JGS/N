@@ -2160,8 +2160,16 @@
     }
 
     window.addEventListener('popstate', (e) => {
+      const modalOverlay = document.getElementById('modalOverlay');
+      const wasModalOpen = modalOverlay && modalOverlay.classList.contains('active');
+      const newState = e.state || {};
+      if (wasModalOpen && !newState.modalOpen) {
+        // كنا في نافذة تفاصيل الطلب: نقفلها بس، والصفحة اللي تحتها تفضل زي ما هي.
+        modalOverlay.classList.remove('active');
+        return;
+      }
       isPopStateNav = true;
-      const pid = (e.state && e.state.pageId) || 'home';
+      const pid = newState.pageId || 'home';
       navigateTo(pid);
       isPopStateNav = false;
     });
@@ -2173,6 +2181,14 @@
       const now = Date.now();
       if (now - lastGoBackTime < 500) return;
       lastGoBackTime = now;
+
+      const modalOverlay = document.getElementById('modalOverlay');
+      if (modalOverlay && modalOverlay.classList.contains('active')) {
+        // لو نافذة تفاصيل الطلب مفتوحة، ضغطة الرجوع تقفلها بس (خطوة واحدة)
+        // من غير ما تنقل الصفحة كمان في نفس الضغطة.
+        closeModal();
+        return;
+      }
 
       showNavProgress();
       // إن لم يكن هناك سجل تصفح فعلي داخل التطبيق نفسه (مثلاً إذا فُتحت الصفحة
@@ -3250,11 +3266,24 @@ ${AI_PRICE_KNOWLEDGE}
         updatePrice();
       }
 
-      document.getElementById('modalOverlay').classList.add('active');
+      const modalOverlay = document.getElementById('modalOverlay');
+      if (!modalOverlay.classList.contains('active')) {
+        // نضيف محطة في السجل خاصة بفتح نافذة تفاصيل الطلب، حتى ضغطة رجوع
+        // واحدة (أو إيماءة واحدة) تقفل النافذة بس، من غير ما تنقل الصفحة
+        // اللي تحتها للرئيسية أو غيرها.
+        history.pushState({ pageId: currentPageId, modalOpen: true }, '', location.hash || ('#' + currentPageId));
+      }
+      modalOverlay.classList.add('active');
     }
 
     function closeModal() {
-      document.getElementById('modalOverlay').classList.remove('active');
+      if (history.state && history.state.modalOpen) {
+        // نرجع خطوة وحدة في السجل، وده هيخلي معالج popstate يقفل النافذة
+        // من غير ما يغيّر الصفحة اللي تحتها.
+        history.back();
+      } else {
+        document.getElementById('modalOverlay').classList.remove('active');
+      }
     }
 
     function calculateAcrylicPrice() {
