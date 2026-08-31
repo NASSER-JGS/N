@@ -854,6 +854,71 @@
       white-space: nowrap;
     }
 
+    /* شريط مضيء يلف حول دائرة "ناصر AI" فقط، لتمييزها عن باقي عناصر الشريط السفلي */
+    #navBtn-ai {
+      position: relative;
+    }
+
+    #navBtn-ai .nav-item-icon {
+      position: relative;
+      z-index: 1;
+      padding: 3px;
+      background: transparent;
+    }
+
+    #navBtn-ai .nav-item-icon img {
+      border-radius: 50%;
+    }
+
+    #navBtn-ai .nav-item-icon::before {
+      content: '';
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, #30519e, #18b09c, #e7413c, #30519e);
+      animation: aiRingSpin 3s linear infinite;
+      z-index: -1;
+      filter: saturate(1.2);
+    }
+
+    @keyframes aiRingSpin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* تعليق صغير يظهر فوق دائرة ناصر AI مرة واحدة عند دخول الموقع ثم يختفي */
+    .ai-update-tip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-4px);
+      background: rgba(20, 20, 20, 0.8);
+      color: #fff;
+      font-size: 0.58rem;
+      font-weight: 600;
+      padding: 4px 9px;
+      border-radius: 8px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      z-index: 2;
+    }
+
+    .ai-update-tip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid transparent;
+      border-top-color: rgba(20, 20, 20, 0.8);
+    }
+
+    .ai-update-tip.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-8px);
+    }
+
     /* ===== صفحة ناصر AI ===== */
     .ai-chat-wrapper {
       display: flex;
@@ -1936,6 +2001,7 @@
 
   <nav class="bottom-nav" id="bottomNav">
     <button class="nav-item" id="navBtn-ai" onclick="navigateTo('ai')">
+      <span class="ai-update-tip" id="aiUpdateTip">جرب التحديث 0.2</span>
       <span class="nav-item-icon"><img src="SORA30.webp" alt="" width="22" height="22" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"><span class="nav-emoji" style="display:none;">🤖</span></span>
       <span class="nav-item-label">ناصر AI</span>
     </button>
@@ -1972,7 +2038,16 @@
       }
       showNavProgress();
       if (!isPopStateNav) {
-        history.pushState({ pageId: resolvedPageId }, '', '#' + resolvedPageId);
+        if (currentPageId === 'home' && resolvedPageId !== 'home') {
+          // الانتقال من الرئيسية لصفحة داخلية: نضيف محطة جديدة في السجل
+          // حتى يقدر المستخدم يرجع للرئيسية بضغطة واحدة (أو إيماءة واحدة).
+          history.pushState({ pageId: resolvedPageId }, '', '#' + resolvedPageId);
+        } else {
+          // أي تنقّل تاني (بين صفحتين داخليتين، أو رجوع صريح للرئيسية) يستبدل
+          // المحطة الحالية بدل ما يضيف واحدة جديدة، عشان السجل ما يتراكم
+          // ويحتاج المستخدم يدوس رجوع أكتر من مرة عشان يوصل للرئيسية.
+          history.replaceState({ pageId: resolvedPageId }, '', '#' + resolvedPageId);
+        }
       }
       renderPage(resolvedPageId);
       hideNavProgress();
@@ -2275,6 +2350,17 @@
 
     /* ===== إعداد المتصفح: سجل الصفحات + شريط التنقل ===== */
     history.replaceState({ pageId: 'home' }, '', '#home');
+
+    /* تعليق "جرب التحديث 0.2" فوق دائرة ناصر AI: يظهر مرة واحدة فقط عند
+       دخول الموقع ويختفي تلقائياً بعد ثلاث ثوانٍ. */
+    (function showAiUpdateTip() {
+      const tip = document.getElementById('aiUpdateTip');
+      if (!tip) return;
+      requestAnimationFrame(() => {
+        tip.classList.add('show');
+        setTimeout(() => tip.classList.remove('show'), 3000);
+      });
+    })();
 
     (function initBottomNavScroll() {
       const appContainer = document.getElementById('appContainer');
