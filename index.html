@@ -2162,16 +2162,20 @@
     window.addEventListener('popstate', (e) => {
       const modalOverlay = document.getElementById('modalOverlay');
       const wasModalOpen = modalOverlay && modalOverlay.classList.contains('active');
-      const newState = e.state || {};
-      if (wasModalOpen && !newState.modalOpen) {
+      if (wasModalOpen) {
         // كنا في نافذة تفاصيل الطلب: نقفلها بس، والصفحة اللي تحتها تفضل زي ما هي.
         modalOverlay.classList.remove('active');
         return;
       }
-      isPopStateNav = true;
-      const pid = newState.pageId || 'home';
-      navigateTo(pid);
-      isPopStateNav = false;
+      // أي رجوع (من الزر أو من إيماءة الجوال) وإحنا مش في الصفحة الرئيسية
+      // يوديك للرئيسية على طول، من أول ضغطة/إيماءة، بغض النظر عن تفاصيل
+      // محطة السجل اللي رجعنالها فعلياً (عشان نتفادى أي حالة يتراكم فيها
+      // أكتر من محطة ويحتاج المستخدم يدوس أكتر من مرة).
+      if (currentPageId !== 'home') {
+        isPopStateNav = true;
+        navigateTo('home');
+        isPopStateNav = false;
+      }
     });
 
     function goBack() {
@@ -2191,14 +2195,10 @@
       }
 
       showNavProgress();
-      // إن لم يكن هناك سجل تصفح فعلي داخل التطبيق نفسه (مثلاً إذا فُتحت الصفحة
-      // مباشرة برابط داخلي)، نرجع للرئيسية مباشرة بدل الاعتماد على history.back()
-      // التي قد لا تستجيب أو تُخرج المستخدم من الموقع بالكامل.
-      if (history.state && history.state.pageId) {
-        history.back();
-      } else {
-        navigateTo('home');
-      }
+      // ننقل للرئيسية فوراً وبشكل متزامن (مش هنستنى حدث popstate غير المتزامن
+      // من المتصفح)، عشان ضغطة زر "عودة" توديك للرئيسية من أول ضغطة دايماً،
+      // بدل ما تعتمد على توقيت المتصفح في إطلاق history.back().
+      navigateTo('home');
     }
     let lastGoBackTime = 0;
 
