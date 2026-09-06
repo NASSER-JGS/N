@@ -2505,16 +2505,15 @@
     refreshFavoriteHearts();
 
     /* ===== ناصر AI ===== */
-    // مفاتيح Groq API — يمكنك إضافة مفتاح ثانٍ (أو أكثر) هنا، والنظام يوزّع الطلبات بينها
-    // تلقائياً، وإذا تعرّض مفتاح للزحمة (429) يتحول فوراً للمفتاح الثاني بدون أي انتظار،
-    // مما يقلل زمن الاستجابة بشكل كبير وقت الضغط. اترك المصفوفة بمفتاح واحد إذا ما عندك ثاني.
-    const GROQ_API_KEYS = [
-      "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",
-      "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"
-    ].filter(k => k && k.indexOf('ضع_') !== 0);
-    const GROQ_API_KEY = GROQ_API_KEYS[0] || ''; // للتوافق مع أي كود قديم يشير للمتغير القديم
+    // ملاحظة أمان مهمة: مفاتيح Groq الحقيقية لم تعد موجودة هنا في كود الواجهة إطلاقاً.
+    // أي مفتاح API يُكتب داخل ملف HTML يشوفه أي زائر بفتح "عرض المصدر"، وGroq بيكتشف
+    // المفاتيح المكشوفة في صفحات عامة ويُلغيها تلقائياً (وهذا سبب توقف الخدمة سابقاً).
+    // الحل: الطلبات بتروح الآن لمسار /api/chat على نفس موقعك (Vercel Serverless Function)
+    // هو اللي يحتفظ بالمفاتيح الحقيقية بشكل سري (Environment Variables في لوحة Vercel).
+    // ملحوظة: المسار ده نسبي ("/api/chat")، يعني هيشتغل تلقائي على أي دومين تنشر
+    // عليه الموقع من غير ما تحتاج تعدل أي حاجة هنا.
+    const NASSER_AI_PROXY_URL = "/api/chat";
     const GROQ_MODEL = "qwen/qwen3.6-27b";
-    let groqKeyCursor = 0; // مؤشر دوري لتوزيع الطلبات على المفاتيح المتاحة
 
     const AI_CATEGORY_MAP = {
       "بوكسات": null,
@@ -2819,9 +2818,9 @@ ${AI_PRICE_KNOWLEDGE}
       showAiTyping();
       const historyLenBeforeCall = aiChatHistory.length;
       try {
-        if (!GROQ_API_KEYS.length || GROQ_API_KEYS[0].indexOf('ضع_') === 0) {
+        if (!NASSER_AI_PROXY_URL || NASSER_AI_PROXY_URL.indexOf('ضع_') === 0) {
           hideAiTyping();
-          appendAiBubble('bot', 'خدمة ناصر AI غير مفعّلة بعد على هذا الجهاز. يرجى إضافة مفتاح التفعيل من الإعدادات.');
+          appendAiBubble('bot', 'خدمة ناصر AI غير مفعّلة بعد على هذا الجهاز. يرجى إعداد رابط السيرفر الوسيط من الإعدادات.');
           return;
         }
 
@@ -2848,10 +2847,6 @@ ${AI_PRICE_KNOWLEDGE}
         const MAX_SINGLE_WAIT_MS = 8000;
         const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-        // مؤشر محلي لهذا الطلب يبدأ من المؤشر الدوري العام، لتوزيع الأحمال بالتساوي بين المفاتيح
-        let keyCursor = groqKeyCursor % GROQ_API_KEYS.length;
-        groqKeyCursor++;
-
         while (loopGuard < 4) {
           loopGuard++;
           const trimmedHistory = safeTrimHistory(aiChatHistory, 16);
@@ -2860,15 +2855,15 @@ ${AI_PRICE_KNOWLEDGE}
           let rateLimitAttempt = 0;
 
           // حلقة إعادة المحاولة الصامتة عند أي فشل مؤقت (429، أخطاء سيرفر 5xx، أو انقطاع شبكة)
+          // ملاحظة: تدوير المفاتيح والتعامل مع الزحمة بقى شغل السيرفر الوسيط (Worker) نفسه؛
+          // العميل هنا بس بيعيد الاتصال بالـ proxy لو رجع خطأ مؤقت.
           while (true) {
             networkErr = null;
-            const currentKey = GROQ_API_KEYS[keyCursor % GROQ_API_KEYS.length];
             try {
-              response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+              response = await fetch(NASSER_AI_PROXY_URL, {
                 method: 'POST',
                 headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${currentKey}`
+                  'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                   model: GROQ_MODEL,
@@ -2895,18 +2890,13 @@ ${AI_PRICE_KNOWLEDGE}
 
             if (isTransientFailure && rateLimitAttempt < MAX_RATE_LIMIT_RETRIES) {
               rateLimitAttempt++;
-              if (isRateLimited && GROQ_API_KEYS.length > 1) {
-                // عندنا أكثر من مفتاح: بدّل فوراً للمفتاح التالي بدون أي انتظار (أسرع بكثير من الانتظار)
-                keyCursor++;
-              } else {
-                let waitMs = RATE_LIMIT_RETRY_DELAYS[rateLimitAttempt - 1] || 6000;
-                if (isRateLimited) {
-                  // نحترم المدة الفعلية التي يطلبها Groq قبل السماح بمحاولة جديدة إن وُجدت
-                  const suggested = extractRetryAfterMs(response, data);
-                  if (suggested !== null) waitMs = Math.min(suggested + 200, MAX_SINGLE_WAIT_MS);
-                }
-                await sleep(waitMs);
+              let waitMs = RATE_LIMIT_RETRY_DELAYS[rateLimitAttempt - 1] || 6000;
+              if (isRateLimited) {
+                // نحترم المدة الفعلية التي يطلبها Groq قبل السماح بمحاولة جديدة إن وُجدت
+                const suggested = extractRetryAfterMs(response, data);
+                if (suggested !== null) waitMs = Math.min(suggested + 200, MAX_SINGLE_WAIT_MS);
               }
+              await sleep(waitMs);
               continue; // أعد المحاولة دون إظهار أي رسالة للعميل
             }
 
@@ -2929,7 +2919,7 @@ ${AI_PRICE_KNOWLEDGE}
             if (httpCode === 429 || errType === 'rate_limit_exceeded') {
               friendlyMsg = 'زحمة شوي عندنا هالثانية 🙏 اكتب سؤالك مرة ثانية وبيوصل، أو راسلنا على واتساب لو مستعجل.';
             } else if (httpCode === 401 || httpCode === 403) {
-              friendlyMsg = 'تعذر الاتصال بخدمة ناصر AI حالياً (خطأ في مفتاح التفعيل). يرجى مراجعة الإدارة.';
+              friendlyMsg = 'تعذر الاتصال بخدمة ناصر AI حالياً (خطأ في إعدادات السيرفر الوسيط). يرجى مراجعة الإدارة.';
             } else {
               const apiMsg = data?.error?.message || data?.error?.code || '';
               friendlyMsg = apiMsg
